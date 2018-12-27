@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 module Kucoin
-  module Client
+  module Api
     class Websocket
-      USERCENTER_LOGIC_URL = 'https://kitchen.kucoin.com/v1/bullet/usercenter/loginUser?protocol=websocket&encrypt=true'
+      USERCENTER_LOGIC_URL = 'https://kitchen.kucoin.com/v1/bullet/usercenter/loginUser?protocol=websocket&encrypt=true'.freeze
 
       attr_reader :bullet_token, :endpoint, :id, :ping_interval
 
       def initialize
         response = Faraday.get(USERCENTER_LOGIC_URL)
         if response.status == 200
-          data = Oj.load(response.body)["data"]
+          data = JSON.parse(response.body)["data"]
           @bullet_token = data["bulletToken"]
           @endpoint = data["instanceServers"][0]["endpoint"]
           @id = rand Time.now.to_i
