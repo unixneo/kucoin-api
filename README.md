@@ -64,13 +64,14 @@ Create a new instance of the REST Client:
 client = Kucoin::Client::REST.new
 
 # Otherwise provide an api_key as keyword arguments
-client = Kucoin::Client::REST.new api_key: 'your.api_key'
+client = Kucoin::Client::REST.new api_key: 'your.api_key', api_secret: 'your.api_secret'
 ```
 
 ALTERNATIVELY, set your API key in exported environment variable:
 
 ```bash
 export KUCOIN_API_KEY=your.api_key
+export KUCOIN_API_SECRET=your.api_secret
 ```
 
 Then you can instantiate client without parameters as in first variation above.
