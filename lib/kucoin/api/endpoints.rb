@@ -9,6 +9,9 @@ module Kucoin
       language: {
         all: 'v1/open/lang-list',
         update: 'v1/user/change-lang'
+      },
+      user: {
+        info: 'v1/user/info'
       }
     }
   end
