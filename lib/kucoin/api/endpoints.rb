@@ -28,7 +28,7 @@ module Kucoin
         cancel:            'v1/cancel-order?symbol=:symbol',
         cancel_all:        'v1/order/cancel-all?symbol=:symbol',
         dealt:             'v1/order/dealt',
-        deal:              'v1/deal-orders',
+        specific_dealt:    'v1/deal-orders',
         all:               'v1/orders',
         detail:            'v1/order/detail',
       },

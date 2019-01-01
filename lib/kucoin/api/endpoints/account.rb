@@ -8,7 +8,7 @@ module Kucoin
         end
 
         def wallet_records coin, options={}
-          auth.ku_request :post, :wallet_records, coin: coin, **options
+          auth.ku_request :get, :wallet_records, coin: coin, **options
         end
 
         def withdraw coin, options={}
@@ -16,7 +16,7 @@ module Kucoin
         end
 
         def cancel_withdraw coin, options={}
-          auth.ku_request :get, :cancel_withdraw, coin: coin, **options
+          auth.ku_request :post, :cancel_withdraw, coin: coin, **options
         end
 
         def balance coin
