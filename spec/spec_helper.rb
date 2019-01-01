@@ -1,5 +1,9 @@
+require 'webmock/rspec'
+require 'simplecov'
+
 require "bundler/setup"
 require "kucoin/api"
+Dir["./spec/support/**/*.rb"].sort.each { |f| require f}
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
