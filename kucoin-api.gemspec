@@ -7,11 +7,11 @@ Gem::Specification.new do |spec|
   spec.name          = "kucoin-api"
   spec.version       = Kucoin::Api::VERSION
   spec.authors       = ["Michael Lang"]
-  spec.email         = []
+  spec.email         = ["mwlang@cybrains.net"]
 
   spec.summary       = "Implements Kucoin API and Websocket"
   spec.description   = spec.summary
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/mwlang/kucoin-api"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'

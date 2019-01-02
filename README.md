@@ -61,10 +61,10 @@ Create a new instance of the REST Client:
 
 ```ruby
 # If you only plan on touching public API endpoints, you can forgo any arguments
-client = Kucoin::Client::REST.new
+client = Kucoin::Api::REST.new
 
 # Otherwise provide an api_key as keyword arguments
-client = Kucoin::Client::REST.new api_key: 'your.api_key', api_secret: 'your.api_secret'
+client = Kucoin::Api::REST.new api_key: 'your.api_key', api_secret: 'your.api_secret'
 ```
 
 ALTERNATIVELY, set your API key in exported environment variable:
@@ -79,52 +79,37 @@ Then you can instantiate client without parameters as in first variation above.
 Create various requests:
 
 ```ruby
-# Ping the server
-client.time
-  # => {"time"=>1527470756975}
+# Currencies Plugin / List exchange rate of coins
+client.currency.all
+  # => {"rates"=>{"TRAC"=>{"CHF"=>0.02, "HRK"=>0.14...}}
 
-# Get candle data
-client.candles "ABT-BTC", timeframe: '1m'
-  # => {"candles"=>[
-  #   {"timeframe"=>"1m", "trading_pair_id"=>"ABT-BTC", "timestamp"=>1527384360000, "volume"=>"0",
-  #     "open"=>"0.00012873", "close"=>"0.00012873", "high"=>"0.00012873", "low"=>"0.00012873"
-  #   },
-  #   {"timeframe"=>"1m", "trading_pair_id"=>"ABT-BTC", "timestamp"=>1527384420000, "volume"=>"0",
-  #     "open"=>"0.00012873", "close"=>"0.00012873", "high"=>"0.00012873", "low"=>"0.00012873"
-  #   },
-  #   {"timeframe"=>"1m", "trading_pair_id"=>"ABT-BTC", ...
-
-
-# Place an order
-client.place_order 'ABT-BTC', side: :ask, type: :limit, price: 0.000127, size: 22
-  # => {
-  #   "order"=>{
-  #     "id"=>"298e5465-7282-47ca-9a1f-377c56487f5f",
-  #     "trading_pair_id"=>"ABT-BTC",
-  #     "side"=>"ask",
-  #     "type"=>"limit",
-  #     "price"=>"0.000127",
-  #     "size"=>"22",
-  #     "filled"=>"0",
-  #     "state"=>"queued",
-  #     "timestamp"=>1527471152779,
-  #     "eq_price"=>"0",
-  #     "completed_at"=>nil,
-  #     "source"=>"exchange"
-  #     }
+# Public Market Data / Tick
+client.market.tick(symbol: 'KCS-BTC')
+  # => {"coinType"=>"KCS", "trading"=>true, "symbol"=>"KCS-BTC", "lastDealPrice"=>0.00016493, 
+  #     "buy"=>0.00016493, "sell"=>0.00016697, "change"=>2.41e-06, "coinTypePair"=>"BTC", "sort"=>0, 
+  #     "feeRate"=>0.001, "volValue"=>19.92555026, "high"=>0.00016888, "datetime"=>1546427934000, 
+  #     "vol"=>120465.9024, "low"=>0.000161, "changeRate"=>0.0148
   #   }
 
 
-# Get deposit address
-client.get_deposit_addresses
-  => { "deposit_addresses"=>[
-    { "address"=>"0x8bdFCC26CaA363234528288471107D90525d6BF923",
-      "blockchain_id"=>"ethereum",
-      "created_at"=>1527263083623,
-      "currency"=>"FXT",
-      "type"=>"exchange"
-      },
-    ...
+# Trading / Create an order
+client.order.create 'KCS-BTC', type: 'BUY', price: 0.000127, amount: 22
+  # => { "orderOid": "596186ad07015679730ffa02" }
+
+
+# Assets Operation / Get coin deposit address
+client.account.wallet_address('KCS')
+  # => {
+  #       "oid": "598aeb627da3355fa3e851ca",
+  #       "address": "598aeb627da3355fa3e851ca",
+  #       "context": null,
+  #       "userOid": "5969ddc96732d54312eb960e",
+  #       "coinType": "KCS",
+  #       "createdAt": 1502276446000,
+  #       "deletedAt": null,
+  #       "updatedAt": 1502276446000,
+  #       "lastReceivedAt": 1502276446000
+  #     }
 ```
 
 Required and optional parameters, as well as enum values, can currently be found on the [Kucoin Apiary Page](https://kucoinapidocs.docs.apiary.io). Parameters should always be passed to client methods as keyword arguments in snake_case form.  symbol, when a required parameter is simply passed as first parameter for most API calls.
@@ -136,173 +121,309 @@ names, aliases (if any) and parameters of the methods to access endpoints.  For 
 of the endpoint's URL and alias method follows the title/name given in Kucoin API documentation.  There were some deviations
 where there would otherwise be name clashes/overloading.
 
-#### System Endpoints
+#### Currencies Plugin
 ----
 ```ruby
-time
+currency.all
 ```
 * required params: none
 ----
 ```ruby
-info
+currency.update currency
+```
+* required params: currency
+
+
+#### Language
+----
+```ruby
+language.all
+```
+* required params: none
+----
+```ruby
+language.update lang
+```
+* required params: lang
+
+#### User
+----
+```ruby
+user.info
 ```
 * required params: none
 
-#### Market Endpoints
+#### Assets Operation
 ----
 ```ruby
-currencies
+# Get coin deposit address
+account.wallet_address coin 
 ```
-* alias: get_all_currencies
-* required params: none
+* required params: coin
 ----
 ```ruby
-trading_pairs
+# Create withdrawal apply
+account.withdraw coin, options={}
 ```
-* alias: get_all_trading_pairs
-* required params: none
+* required params: coin
 ----
 ```ruby
-order_book trading_pair_id
+# Cancel withdrawal
+account.wallet_records coin, options={}
 ```
-* alias: get_order_book
-* required params: trading_pair_id
+* required params: coin, type, status
 ----
 ```ruby
-precisions trading_pair_id
+# List deposit & withdrawal records
+account.wallet_records coin, options={}
 ```
-* alias: get_order_book_precisions
-* required params: trading_pair_id
+* required params: coin, type, status
 ----
 ```ruby
-stats
+# Get balance of coin
+account.balance coin
 ```
-* required params: none
+* required params: coin
 ----
 ```ruby
-tickers trading_pair_id
+# Get balance by page
+account.balances options={}
 ```
-* alias: get_ticker
-* required params: none
-----
-```ruby
-market_trades trading_pair_id
-```
-* alias: get_recent_trades
 * required params: none
 
-#### Chart Endpoints
+#### Trading
 ----
 ```ruby
-candles trading_pair_id, options={}
+# Create an order
+order.create symbol, options={} 
 ```
-* required params: trading_pair_id, timeframe
+* required params: symbol, type, price, amount
+----
+```ruby
+# List active orders
+order.active symbol, options={} 
+```
+* required params: symbol
+----
+```ruby
+# List active orders in kv format
+order.active_kv symbol, options={}
+```
+* required params: symbol
+----
+```ruby
+# Cancel orders
+order.cancel symbol, options={}
+```
+* required params: symbol, orderOid, type
+----
+```ruby
+# Cancel all orders
+order.cancel_all symbol, options={}
+```
+* required params: symbol
+----
+```ruby
+# List dealt orders
+order.dealt options={}
+```
+* required params: none
+----
+```ruby
+# List dealt orders(specific symbol)
+order.specific_dealt symbol, options={}
+```
+* required params: symbol
+----
+```ruby
+# List all orders
+order.all symbol, options={} 
+```
+* required params: symbol, direction
+----
+```ruby
+# Order details
+account.detail symbol, options={}
+```
+* required params: symbol, type, orderOid
 
-#### Trading Endpoints
+#### Public Market Data
 ----
 ```ruby
-order order_id
+# Tick(Open)
+market.tick options={}
 ```
-* alias: get_order
-* required params: order_id
-----
-```ruby
-order_trades order_id
-```
-* alias: get_trades_of_an_order
-* required params: order_id
-----
-```ruby
-orders
-```
-* alias: get_all_orders
 * required params: none
 ----
 ```ruby
-place_order trading_pair_id, options={}
-  ```
-* required params: side, type, size, price (except market orders)
+# Order books(Open)
+market.orders symbol, options={} 
+```
+* required params: symbol
 ----
 ```ruby
-modify_order order_id, options={}
+# Buy Order Books(Open)
+market.buy_orders symbol, options={} 
 ```
-* required params: order_id, size, price
+* required params: symbol
 ----
 ```ruby
-cancel_order order_id
+# Sell Order Books(Open)
+market.sell_orders symbol, options={} 
 ```
-* required params: order_id
+* required params: symbol
 ----
 ```ruby
-order_history trading_pair_id=nil, options={}
+# Recently deal orders(Open)
+market.recent_deal_orders symbol, options={} 
 ```
-* alias: get_order_history
+* required params: symbol
+----
+```ruby
+# List trading markets(Open)
+market.trading 
+```
 * required params: none
 ----
 ```ruby
-get_trade trade_id
+# List trading symbols tick (Open)
+market.trading_symbols options={} 
 ```
-* alias: trade
-* required params: trade_id
+* required params: none
 ----
 ```ruby
-trades trading_pair_id, options={}
+# List trendings(Open)
+market.trading_coins options={} 
 ```
-* required params: trading_pair_id
+* required params: none
+----
+```ruby
+# Get kline data(Open)
+market.kline symbol, options={} 
+```
+* required params: symbol
+----
+```ruby
+# Get kline config(Open, TradingView Version)
+market.chart_config 
+```
+* required params: none
+----
+```ruby
+# Get symbol tick(Open, TradingView Version)
+market.chart_symbols symbol 
+```
+* required params: none
+----
+```ruby
+# Get kline data(Open, TradingView Version)
+market.chart_history options={} 
+```
+* required params: none
+----
+```ruby
+# Get coin info(Open)
+market.coin_info coin 
+```
+* required params: coin
+----
+```ruby
+# List coins(Open)
+market.coins 
+```
+* required params: none
 
-#### Wallet Endpoints
+#### Market Data For authrozied User
 ----
 ```ruby
-balances
+# List trading symbols tick
+market.my_trading_symbols options={}
 ```
-* alias: get_wallet_balances
 * required params: none
 ----
 ```ruby
-ledger
+# Get stick symbols
+market.stick_symbols
 ```
-* alias: get_ledger_entries
 * required params: none
 ----
 ```ruby
-deposit_addresses
+# Get favourite symbols
+market.favourite_symbols
 ```
-* alias: get_deposit_addresses
 * required params: none
 ----
 ```ruby
-withdrawal_addresses
+# Add/Remove favourite symbol
+market.stick_symbol symbol, options={}
 ```
-* alias: get_withdrawal_addresses
 * required params: none
 ----
 ```ruby
-withdrawal withdrawal_id
+# Add/Remove stick symbol
+market.favourite_symbol symbol, options={}
 ```
-* alias: get_withdrawal
-* required params: withdrawal_id
-----
-```ruby
-withdrawals
-```
-* alias: get_all_withdrawals
-* required params: none
-----
-```ruby
-deposit deposit_id
-```
-* alias: get_deposit
-* required params: deposit_id
-----
-```ruby
-deposits
-```
-* alias: get_all_deposits
 * required params: none
 
 ### WebSocket Client
 
-* COMING SOON!
+Create a new instance of the WebSocket Client:
+
+```ruby
+client = Kucoin::Api::Websocket.new
+```
+
+Subscribe various topics:
+
+```ruby
+# Currencies Plugin / List exchange rate of coins
+methods = { message: proc { |event| puts event.data } }
+client.tick(symbol: 'ETH-BTC', methods: methods)
+  # => {"id":"259173795477643264","type":"ack"}
+  # => {"data"=>{"coinType"=>"ETH", ...}, "topic"=>"/market/ETH-BTC_TICK", "type"=>"message", "seq"=>32752982312089}
+  # => {"data"=>{"coinType"=>"ETH", ...}, "topic"=>"/market/ETH-BTC_TICK", "type"=>"message", "seq"=>32752982458728}
+  # => ...
+```
+
+All subscription topic method will expect "methods" in argument(As shown above). 
+It's The Hash which contains the event handler methods to pass to the WebSocket client methods. 
+Proc is the expected value of each event handler key. Following are list of expected event handler keys. 
+  - :open    - The Proc called when a stream is opened (optional)
+  - :message - The Proc called when a stream receives a message
+  - :error   - The Proc called when a stream receives an error (optional)
+  - :close   - The Proc called when a stream is closed (optional)
+
+### WebSocket Subscribe Topics
+
+Subscribe topics are in order as documented on the Kucoin Apiary page (linked above).
+
+#### Orderbook level2
+
+```ruby
+  client.orderbook symbol: symbol, methods: methods
+```
+* required params: symbol, methods*
+
+#### History
+
+```ruby
+  client.history symbol: symbol, methods: methods
+```
+* required params: symbol, methods*
+
+#### Tick
+
+```ruby
+  client.tick symbol: symbol, methods: methods
+```
+* required params: symbol, methods*
+
+#### Market
+
+```ruby
+  client.market symbol: symbol, methods: methods
+```
+* required params: symbol, methods*
 
 ## Development
 
