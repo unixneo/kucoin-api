@@ -1,0 +1,39 @@
+{
+  "success": true,
+  "code": "OK",
+  "msg": "Operation succeeded",
+  "timestamp": 1546336552778,
+  "data": {
+    "bulletToken": "gH1_HmSAwdh0FlOnGPyacf7xOiCpz54uLUUsvt_e5BPN4SuEe6JmkA==.o01w3FA7sVxx8_7RkrlO6g==",
+    "instanceServers": [
+      {
+        "pingInterval": 40000,
+        "endpoint": "wss://push1.kucoin.com/endpoint",
+        "protocol": "websocket",
+        "encrypt": true,
+        "pingTimeout": 60000,
+        "userType": "normal"
+      },
+      {
+        "pingInterval": 40000,
+        "endpoint": "wss://push1.kucoin.com/endpoint",
+        "protocol": "websocket",
+        "encrypt": true,
+        "pingTimeout": 60000,
+        "userType": "vip"
+      }
+    ],
+    "historyServers": [
+      {
+        "endpoint": "https://kitchen.kucoin.com/v1/bullet/history",
+        "encrypt": true,
+        "userType": "vip"
+      },
+      {
+        "endpoint": "https://kitchen.kucoin.com/v1/bullet/history",
+        "encrypt": true,
+        "userType": "normal"
+      }
+    ]
+  }
+}
