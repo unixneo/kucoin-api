@@ -26,7 +26,7 @@ module Kucoin
 
             # parameters go into request body, not headers on POSTs
             if method == :post
-              req.body = options.to_json
+              req.body = options
             else
               req.params.merge!(options)
             end
@@ -37,12 +37,8 @@ module Kucoin
         private
 
         def success_or_error response
-          if response.body.is_a?(Hash)
-            return response.body["data"] if response.body["success"]
-            body = response.body
-          else
-            body = JSON.parse(response.body)
-          end
+          body = response.body.is_a?(Hash) ? response.body : JSON.parse(response.body)
+          return body["data"] if body["success"]
           raise Kucoin::Api::ClientError.new("#{body["code"]} - #{body["msg"]}")
         rescue => e
           raise Kucoin::Api::ClientError.new("#{e.message}\n#{response.body}")
