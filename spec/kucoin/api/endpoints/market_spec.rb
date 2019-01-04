@@ -70,21 +70,25 @@ RSpec.describe Kucoin::Api::Endpoints::Market, type: :endpoint do
   end
 
   describe '#my_trading_symbols' do
+    let(:auth_request)    { true }
     let(:request_url)     { 'https://api.kucoin.com/v1/market/symbols' }
     it { expect(subject.my_trading_symbols).to eq({"foo"=>"bar"}) }
   end
 
   describe '#stick_symbols' do
+    let(:auth_request)    { true }
     let(:request_url)     { 'https://api.kucoin.com/v1/market/stick-symbols' }
     it { expect(subject.stick_symbols).to eq({"foo"=>"bar"}) }
   end
 
   describe '#favourite_symbols' do
+    let(:auth_request)    { true }
     let(:request_url)     { 'https://api.kucoin.com/v1/market/fav-symbols' }
     it { expect(subject.favourite_symbols).to eq({"foo"=>"bar"}) }
   end
 
   describe '#stick_symbol' do
+    let(:auth_request)    { true }
     let(:request_url)     { 'https://api.kucoin.com/v1/market/symbol/stick?symbol=ETH-BTC' }
     let(:request_method)  { :post }
     let(:request_body)    { {} }
@@ -92,6 +96,7 @@ RSpec.describe Kucoin::Api::Endpoints::Market, type: :endpoint do
   end
 
   describe '#favourite_symbol' do
+    let(:auth_request)    { true }
     let(:request_url)     { 'https://api.kucoin.com/v1/market/symbol/fav?symbol=ETH-BTC' }
     let(:request_method)  { :post }
     let(:request_body)    { {} }

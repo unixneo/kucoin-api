@@ -5,6 +5,7 @@ RSpec.describe Kucoin::Api::Endpoints::Language, type: :endpoint do
   end
 
   describe '#update' do
+    let(:auth_request)    { true }
     let(:request_url)     { 'https://api.kucoin.com/v1/user/change-lang?lang=EN' }
     let(:request_method)  { :post }
     let(:request_body)    { "{\"lang\":\"EN\"}" }
