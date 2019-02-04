@@ -29,7 +29,7 @@ module Kucoin
       #   :message - The Proc called when a stream receives a message
       #   :error   - The Proc called when a stream receives an error (optional)
       #   :close   - The Proc called when a stream is closed (optional)
-      def start(stream:, methods:)
+      def start stream:, methods:
         channel = create_stream("#{endpoint}?bulletToken=#{bullet_token}&format=json&resource=api", methods: methods)
         params = {id: id, type: "subscribe", topic: stream[:topic]}
         channel.send(params.to_json)
@@ -43,7 +43,7 @@ module Kucoin
       # API access frequency to 5 times per second per single IP.
       #
       # {"id":123, "type":"subscribe", "topic":"/trade/ETH-BTC_TRADE", "req":1}
-      def orderbook(symbol:, methods:)
+      def orderbook symbol:, methods:
         start stream: { topic: "/trade/#{symbol}_TRADE" }, methods: methods
       end
 
@@ -54,10 +54,9 @@ module Kucoin
       # frequency to 5 times per second per single IP.
       #
       # {"id":123, "type":"subscribe", "topic":"/trade/ETH-BTC_HISTORY", "req":1}
-      def history(symbol:, methods:)
+      def history symbol:, methods:
         start stream: { topic: "/trade/#{symbol}_HISTORY" }, methods: methods
       end
-
 
       # TickWe can subscribe "/market/{symbol}_TICK" to get history info.
       # {symbol} can be replaced by ETH-BTC or BTC-USDT and so on. We need to
@@ -66,7 +65,7 @@ module Kucoin
       # frequency to 5 times per second per single IP
       #
       # {"id":123, "type":"subscribe", "topic":"/market/ETH-BTC_TICK", "req":1}
-      def tick(symbol:, methods:)
+      def tick symbol:, methods:
         start stream: { topic: "/market/#{symbol}_TICK" }, methods: methods
       end
 
@@ -77,7 +76,7 @@ module Kucoin
       # second per single IP.
       #
       # {"id":123, "type":"subscribe", "topic":"/market/BTC", "req":1}
-      def market(symbol:, methods:)
+      def market symbol:, methods:
         start stream: { topic: "/market/#{symbol}" }, methods: methods
       end
 
@@ -93,7 +92,7 @@ module Kucoin
       #   :message - The Proc called when a stream receives a message
       #   :error   - The Proc called when a stream receives an error (optional)
       #   :close   - The Proc called when a stream is closed (optional)
-      def create_stream(url, methods:)
+      def create_stream url, methods:
         Faye::WebSocket::Client.new(url, [], ping: ping_interval).tap { |ws| attach_methods(ws, methods) }
       end
 
@@ -107,7 +106,7 @@ module Kucoin
       #   :message - The Proc called when a stream receives a message
       #   :error   - The Proc called when a stream receives an error (optional)
       #   :close   - The Proc called when a stream is closed (optional)
-      def attach_methods(websocket, methods)
+      def attach_methods websocket, methods
         methods.each_pair do |key, method|
           websocket.on(key) { |event| method.call(event) }
         end

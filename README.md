@@ -45,7 +45,7 @@ Or install it yourself as:
 
 #### TODO
 
-* Websockets currently uses the first InstanceServer returned in the usercenter/loginUser RESTful call.  It is currently not clear what Kucoin intends with InstanceServers vs. HistoryServers nor with userType being either "normal" or "vip", so until a use-case arises or feature/bug request comes along that sheds some light on how to select and use specific servers, the websocket interface is hard-wired to the first instance server returned.
+* Websockets currently uses the first InstanceServer returned in the usercenter/loginUser RESTful call. It is currently not clear what Kucoin intends with InstanceServers vs. HistoryServers nor with userType being either "normal" or "vip", so until a use-case arises or feature/bug request comes along that sheds some light on how to select and use specific servers, the websocket interface is hard-wired to the first instance server returned.
 
 ## Getting Started
 
@@ -85,9 +85,9 @@ client.currency.all
 
 # Public Market Data / Tick
 client.market.tick(symbol: 'KCS-BTC')
-  # => {"coinType"=>"KCS", "trading"=>true, "symbol"=>"KCS-BTC", "lastDealPrice"=>0.00016493, 
-  #     "buy"=>0.00016493, "sell"=>0.00016697, "change"=>2.41e-06, "coinTypePair"=>"BTC", "sort"=>0, 
-  #     "feeRate"=>0.001, "volValue"=>19.92555026, "high"=>0.00016888, "datetime"=>1546427934000, 
+  # => {"coinType"=>"KCS", "trading"=>true, "symbol"=>"KCS-BTC", "lastDealPrice"=>0.00016493,
+  #     "buy"=>0.00016493, "sell"=>0.00016697, "change"=>2.41e-06, "coinTypePair"=>"BTC", "sort"=>0,
+  #     "feeRate"=>0.001, "volValue"=>19.92555026, "high"=>0.00016888, "datetime"=>1546427934000,
   #     "vol"=>120465.9024, "low"=>0.000161, "changeRate"=>0.0148
   #   }
 
@@ -157,7 +157,7 @@ user.info
 ----
 ```ruby
 # Get coin deposit address
-account.wallet_address coin 
+account.wallet_address coin
 ```
 * required params: coin
 ----
@@ -195,13 +195,13 @@ account.balances options={}
 ----
 ```ruby
 # Create an order
-order.create symbol, options={} 
+order.create symbol, options={}
 ```
 * required params: symbol, type, price, amount
 ----
 ```ruby
 # List active orders
-order.active symbol, options={} 
+order.active symbol, options={}
 ```
 * required params: symbol
 ----
@@ -237,7 +237,7 @@ order.specific_dealt symbol, options={}
 ----
 ```ruby
 # List all orders
-order.all symbol, options={} 
+order.all symbol, options={}
 ```
 * required params: symbol, direction
 ----
@@ -257,79 +257,79 @@ market.tick options={}
 ----
 ```ruby
 # Order books(Open)
-market.orders symbol, options={} 
+market.orders symbol, options={}
 ```
 * required params: symbol
 ----
 ```ruby
 # Buy Order Books(Open)
-market.buy_orders symbol, options={} 
+market.buy_orders symbol, options={}
 ```
 * required params: symbol
 ----
 ```ruby
 # Sell Order Books(Open)
-market.sell_orders symbol, options={} 
+market.sell_orders symbol, options={}
 ```
 * required params: symbol
 ----
 ```ruby
 # Recently deal orders(Open)
-market.recent_deal_orders symbol, options={} 
+market.recent_deal_orders symbol, options={}
 ```
 * required params: symbol
 ----
 ```ruby
 # List trading markets(Open)
-market.trading 
+market.trading
 ```
 * required params: none
 ----
 ```ruby
 # List trading symbols tick (Open)
-market.trading_symbols options={} 
+market.trading_symbols options={}
 ```
 * required params: none
 ----
 ```ruby
 # List trendings(Open)
-market.trading_coins options={} 
+market.trading_coins options={}
 ```
 * required params: none
 ----
 ```ruby
 # Get kline data(Open)
-market.kline symbol, options={} 
+market.kline symbol, options={}
 ```
 * required params: symbol
 ----
 ```ruby
 # Get kline config(Open, TradingView Version)
-market.chart_config 
+market.chart_config
 ```
 * required params: none
 ----
 ```ruby
 # Get symbol tick(Open, TradingView Version)
-market.chart_symbols symbol 
+market.chart_symbols symbol
 ```
 * required params: none
 ----
 ```ruby
 # Get kline data(Open, TradingView Version)
-market.chart_history options={} 
+market.chart_history options={}
 ```
 * required params: none
 ----
 ```ruby
 # Get coin info(Open)
-market.coin_info coin 
+market.coin_info coin
 ```
 * required params: coin
 ----
 ```ruby
 # List coins(Open)
-market.coins 
+market.coins
 ```
 * required params: none
 
@@ -385,9 +385,9 @@ client.tick(symbol: 'ETH-BTC', methods: methods)
   # => ...
 ```
 
-All subscription topic method will expect "methods" in argument(As shown above). 
-It's The Hash which contains the event handler methods to pass to the WebSocket client methods. 
-Proc is the expected value of each event handler key. Following are list of expected event handler keys. 
+All subscription topic method will expect "methods" in argument(As shown above).
+It's The Hash which contains the event handler methods to pass to the WebSocket client methods.
+Proc is the expected value of each event handler key. Following are list of expected event handler keys.
   - :open    - The Proc called when a stream is opened (optional)
   - :message - The Proc called when a stream receives a message
   - :error   - The Proc called when a stream receives an error (optional)
@@ -424,10 +424,6 @@ Subscribe topics are in order as documented on the Kucoin Apiary page (linked ab
   client.market symbol: symbol, methods: methods
 ```
 * required params: symbol, methods*
-
-## Development
-
-* RSPECs coming soon!
 
 ## Contributing
 

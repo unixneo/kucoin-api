@@ -6,3 +6,7 @@ def fixture(file)
   fixtures_path = File.expand_path('../../fixtures', __FILE__)
   File.new(fixtures_path + '/' + file)
 end
+
+def logger
+  @logger ||= ::Logger.new('log/test.log')
+end

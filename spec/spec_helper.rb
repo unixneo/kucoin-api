@@ -3,6 +3,7 @@ require 'simplecov'
 
 require "bundler/setup"
 require "kucoin/api"
+require "logger"
 Dir["./spec/support/**/*.rb"].sort.each { |f| require f}
 
 RSpec.configure do |config|
