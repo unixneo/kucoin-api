@@ -64,14 +64,23 @@ Create a new instance of the REST Client:
 client = Kucoin::Api::REST.new
 
 # Otherwise provide an api_key as keyword arguments
-client = Kucoin::Api::REST.new api_key: 'your.api_key', api_secret: 'your.api_secret'
+client = Kucoin::Api::REST.new api_key: 'your.api_key', api_secret: 'your.api_secret', api_passphrase: 'your.api_passphrase'
+
+# You can provide a sandbox as argument to change Sandbox environment 
+client = Kucoin::Api::REST.new sandbox: true 
 ```
+
+|**Environment**        |**BaseUri**                            |
+|:---------------------:|:-------------------------------------:|
+| Production `DEFAULT`  | https://openapi-v2.kucoin.com         |
+| Sandbox               | https://openapi-sandbox.kucoin.com    |
 
 ALTERNATIVELY, set your API key in exported environment variable:
 
 ```bash
 export KUCOIN_API_KEY=your.api_key
 export KUCOIN_API_SECRET=your.api_secret
+export KUCOIN_API_PASSPHRASE=your.api_passphrase
 ```
 
 Then you can instantiate client without parameters as in first variation above.
@@ -79,6 +88,10 @@ Then you can instantiate client without parameters as in first variation above.
 Create various requests:
 
 ```ruby
+# Others / Time / Server Time
+client.other.timestamp
+  # => 1554213599244
+
 # Currencies Plugin / List exchange rate of coins
 client.currency.all
   # => {"rates"=>{"TRAC"=>{"CHF"=>0.02, "HRK"=>0.14...}}
@@ -122,6 +135,7 @@ of the endpoint's URL and alias method follows the title/name given in Kucoin AP
 where there would otherwise be name clashes/overloading.
 
 #### Currencies Plugin
+
 ----
 ```ruby
 currency.all
@@ -135,6 +149,7 @@ currency.update currency
 
 
 #### Language
+
 ----
 ```ruby
 language.all
@@ -147,6 +162,7 @@ language.update lang
 * required params: lang
 
 #### User
+
 ----
 ```ruby
 user.info
@@ -154,6 +170,7 @@ user.info
 * required params: none
 
 #### Assets Operation
+
 ----
 ```ruby
 # Get coin deposit address
@@ -192,6 +209,7 @@ account.balances options={}
 * required params: none
 
 #### Trading
+
 ----
 ```ruby
 # Create an order
@@ -248,6 +266,7 @@ account.detail symbol, options={}
 * required params: symbol, type, orderOid
 
 #### Public Market Data
+
 ----
 ```ruby
 # Tick(Open)
@@ -334,6 +353,7 @@ market.coins
 * required params: none
 
 #### Market Data For authrozied User
+
 ----
 ```ruby
 # List trading symbols tick
@@ -365,7 +385,18 @@ market.favourite_symbol symbol, options={}
 ```
 * required params: none
 
-### WebSocket Client
+#### Other
+
+##### Time
+
+----
+```ruby
+# Server Time
+other.timestamp
+```
+* required params: none
+
+## WebSocket Client
 
 Create a new instance of the WebSocket Client:
 

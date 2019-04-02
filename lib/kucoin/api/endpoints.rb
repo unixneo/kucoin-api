@@ -55,7 +55,15 @@ module Kucoin
         favourite_symbols:  'v1/market/fav-symbols',
         favourite_symbol:   'v1/market/symbol/fav',
         stick_symbol:       'v1/market/symbol/stick',
+      },
+      other: {
+        timestamp:          '/api/v1/timestamp'
       }
     }
+    module Endpoints
+      def self.get_klass name
+        Object.const_get("Kucoin::Api::Endpoints::#{name.to_s.split('_').map(&:capitalize).join}")
+      end
+    end
   end
 end

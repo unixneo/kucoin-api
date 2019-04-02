@@ -24,28 +24,12 @@ module Kucoin
         sandbox? ? SANDBOX_BASE_URL : BASE_URL
       end
 
-      def account
-        @account ||= Kucoin::Api::Endpoints::Account.new(self)
-      end
-
-      def currency
-        @currency ||= Kucoin::Api::Endpoints::Currency.new(self)
-      end
-
-      def language
-        @language ||= Kucoin::Api::Endpoints::Language.new(self)
-      end
-
-      def market
-        @market ||= Kucoin::Api::Endpoints::Market.new(self)
-      end
-
-      def order
-        @order ||= Kucoin::Api::Endpoints::Order.new(self)
-      end
-
-      def user
-        @user ||= Kucoin::Api::Endpoints::User.new(self)
+      Kucoin::Api::ENDPOINTS.keys.each do |endpoint_method|
+        endpoint_klass = Kucoin::Api::Endpoints.get_klass(endpoint_method)
+        define_method endpoint_method do
+          endpoint_var = "@#{endpoint_method}"
+          instance_variable_get(endpoint_var) || instance_variable_set(endpoint_var, endpoint_klass.new(self))
+        end
       end
 
       def open endpoint

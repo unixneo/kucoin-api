@@ -5,7 +5,7 @@ RSpec.describe Kucoin::Api do
 
   it "has endpoints" do
     expect(Kucoin::Api::ENDPOINTS).to be_a Hash
-    expect(Kucoin::Api::ENDPOINTS.keys).to contain_exactly(:account, :currency, :language, :market, :order, :user)
+    expect(Kucoin::Api::ENDPOINTS.keys).to contain_exactly(:account, :currency, :language, :market, :order, :other, :user)
   end
 
   describe 'error class' do

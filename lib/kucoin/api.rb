@@ -12,17 +12,11 @@ require 'kucoin/api/middleware/nonce_request'
 
 require 'kucoin/api/websocket'
 
+require 'kucoin/api/endpoints'
+Dir[File.expand_path('api/endpoints/*.rb', File.dirname(__FILE__))].each {|file| require file }
+
 require 'kucoin/api/rest'
 require 'kucoin/api/rest/connection'
-
-require 'kucoin/api/endpoints'
-require 'kucoin/api/endpoints/base'
-require 'kucoin/api/endpoints/account'
-require 'kucoin/api/endpoints/currency'
-require 'kucoin/api/endpoints/language'
-require 'kucoin/api/endpoints/market'
-require 'kucoin/api/endpoints/order'
-require 'kucoin/api/endpoints/user'
 
 module Kucoin
   module Api; end
