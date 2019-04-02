@@ -2,16 +2,26 @@
 module Kucoin
   module Api
     class REST
-      BASE_URL    = 'https://api.kucoin.com'.freeze
-      API_KEY     = ENV['KUCOIN_API_KEY'].to_s
-      API_SECRET  = ENV['KUCOIN_API_SECRET'].to_s
+      BASE_URL          = 'https://openapi-v2.kucoin.com'.freeze
+      SANDBOX_BASE_URL  = 'https://openapi-sandbox.kucoin.com'.freeze
+      API_KEY           = ENV['KUCOIN_API_KEY'].to_s
+      API_SECRET        = ENV['KUCOIN_API_SECRET'].to_s
+      API_PASSPHRASE    = ENV['KUCOIN_API_PASSPHRASE'].to_s
 
-      attr_reader :api_key, :api_secret, :adapter
+      attr_reader :api_key, :api_secret, :api_passphrase
+      attr_reader :adapter
 
-      def initialize api_key: API_KEY, api_secret: API_SECRET, adapter: Faraday.default_adapter
+      def initialize api_key: API_KEY, api_secret: API_SECRET, api_passphrase: API_PASSPHRASE, adapter: Faraday.default_adapter, sandbox: false
         @api_key = api_key
         @api_secret = api_secret
+        @api_passphrase = api_passphrase
         @adapter = adapter
+        @sandbox = sandbox
+      end
+      def sandbox?; @sandbox == true end
+
+      def base_url
+        sandbox? ? SANDBOX_BASE_URL : BASE_URL
       end
 
       def account
@@ -39,7 +49,7 @@ module Kucoin
       end
 
       def open endpoint
-        Connection.new(endpoint, url: BASE_URL) do |conn|
+        Connection.new(endpoint, url: base_url) do |conn|
           conn.request :json
           conn.response :json, content_type: 'application/json'
           conn.adapter adapter
@@ -47,11 +57,11 @@ module Kucoin
       end
 
       def auth endpoint
-        Connection.new(endpoint, url: BASE_URL) do |conn|
+        Connection.new(endpoint, url: base_url) do |conn|
           conn.request :json
           conn.response :json, content_type: 'application/json'
           conn.use Kucoin::Api::Middleware::NonceRequest
-          conn.use Kucoin::Api::Middleware::AuthRequest, api_key, api_secret
+          conn.use Kucoin::Api::Middleware::AuthRequest, api_key, api_secret, api_passphrase
           conn.adapter adapter
         end
       end

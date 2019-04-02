@@ -2,9 +2,11 @@ RSpec.describe Kucoin::Api::REST do
   let(:client) { described_class.new }
   subject { client }
 
-  it { expect(described_class::BASE_URL).to eq 'https://api.kucoin.com' }
+  it { expect(described_class::BASE_URL).to eq 'https://openapi-v2.kucoin.com' }
+  it { expect(described_class::SANDBOX_BASE_URL).to eq 'https://openapi-sandbox.kucoin.com' }
   it { expect(described_class::API_KEY).to eq '' }
   it { expect(described_class::API_SECRET).to eq '' }
+  it { expect(described_class::API_PASSPHRASE).to eq '' }
 
   [
     ['account',   Kucoin::Api::Endpoints::Account],
@@ -19,6 +21,16 @@ RSpec.describe Kucoin::Api::REST do
         expect(subject.send(endpoint_name)).to be_a endpoint_class
         expect(subject.send(endpoint_name).client).to eq subject
       end
+    end
+  end
+
+  describe '#base_url' do
+    it { expect(subject.base_url).to eq described_class::BASE_URL }
+    it { expect(subject.sandbox?).to be_falsey }
+    describe 'for sandbox' do
+      let(:client) { described_class.new(sandbox: true) }
+      it { expect(subject.base_url).to eq described_class::SANDBOX_BASE_URL }
+      it { expect(subject.sandbox?).to be_truthy }
     end
   end
 

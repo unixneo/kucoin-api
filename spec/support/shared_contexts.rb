@@ -1,5 +1,5 @@
 RSpec.shared_context "endpoint", :shared_context => :metadata do
-  let(:client) { Kucoin::Api::REST.new(api_key: 'foo', api_secret: 'bar') }
+  let(:client) { Kucoin::Api::REST.new(api_key: 'foo', api_secret: 'bar', api_passphrase: 'passphrase') }
   let(:endpoint) { described_class.new(client) }
   subject { endpoint }
 
@@ -7,11 +7,12 @@ RSpec.shared_context "endpoint", :shared_context => :metadata do
   let(:auth_request)    { false }
 
   let(:request_method)  { :get }
-  let(:request_url)     { 'http://example.com' }
+  let(:request_path)    { 'http://example.com' }
+  let(:request_url)     { "#{Kucoin::Api::REST::BASE_URL}#{request_path}" }
   let(:request_body)    { nil }
   let(:request_headers) do
     if auth_request
-      args = {'Kc-Api-Nonce'=> /.*/, 'Kc-Api-Key'=>'foo', 'Kc-Api-Signature'=>/.*/}
+      args = {'Kc-Api-Timestamp'=> /.*/, 'Kc-Api-Key'=>'foo', 'Kc-Api-Sign'=>/.*/, 'Kc-Api-Passphrase'=>/.*/}
       args['Content-Type'] = 'application/json' if request_method == :post
       args
     end
@@ -24,7 +25,7 @@ RSpec.shared_context "endpoint", :shared_context => :metadata do
   end
 
   let(:response_status) { 200 }
-  let(:response_body)   { {success: true, data: { foo: :bar }} }
+  let(:response_body)   { {code: 200000, success: true, data: { foo: :bar }} }
 
   before do
     if request_args.empty?

@@ -4,7 +4,7 @@ module Kucoin
     module Middleware
       class NonceRequest < Faraday::Middleware
         def call env
-          env[:request_headers]["KC-API-NONCE"] = DateTime.now.strftime('%Q')
+          env[:request_headers]["KC-API-TIMESTAMP"] = DateTime.now.strftime('%Q')
           @app.call(env)
         end
       end

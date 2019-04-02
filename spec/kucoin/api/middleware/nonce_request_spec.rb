@@ -9,6 +9,6 @@ RSpec.describe Kucoin::Api::Middleware::NonceRequest do
   end
 
   it 'add NONCE' do
-    expect(env[:request_headers]["KC-API-NONCE"]).to eq '981147906000'
+    expect(env[:request_headers]["KC-API-TIMESTAMP"]).to eq '981147906000'
   end
 end

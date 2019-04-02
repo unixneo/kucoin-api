@@ -3,6 +3,10 @@ module Kucoin
   module Api
     module Endpoints
       class Account < Base
+        def list
+          auth.ku_request :get, :list
+        end
+
         def wallet_address coin
           auth.ku_request :get, :wallet_address, coin: coin
         end

@@ -38,8 +38,9 @@ module Kucoin
 
         def success_or_error response
           body = response.body.is_a?(Hash) ? response.body : JSON.parse(response.body)
-          return body["data"] if body["success"]
-          raise Kucoin::Api::ClientError.new("#{body["code"]} - #{body["msg"]}")
+          return body['data'] if body['code'].to_i == 200000
+          return body if response.status == 200
+          raise Kucoin::Api::ClientError.new("#{body["code"] || body["status"]} - #{body["msg"] || body["message"]}")
         rescue => e
           raise Kucoin::Api::ClientError.new("#{e.message}\n#{response.body}")
         end

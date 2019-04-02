@@ -3,7 +3,7 @@ module Kucoin
   module Api
     ENDPOINTS = {
       currency: {
-        all:                'v1/open/currencies',
+        all:                'api/v1/currencies',
         update:             'v1/user/change-currency'
       },
       language: {
@@ -14,6 +14,7 @@ module Kucoin
         info:               'v1/user/info'
       },
       account: {
+        list:               'api/v1/accounts',
         wallet_address:     'v1/account/:coin/wallet/address',
         wallet_records:     'v1/account/:coin/wallet/records',
         withdraw:           'v1/account/:coin/withdraw/apply',

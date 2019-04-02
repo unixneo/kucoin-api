@@ -3,30 +3,31 @@ module Kucoin
   module Api
     module Middleware
       class AuthRequest < Faraday::Middleware
-        def initialize app, api_key, api_secret
+        def initialize app, api_key, api_secret, api_passphrase
           super(app)
           @api_key = api_key.to_s
           @api_secret = api_secret.to_s
+          @api_passphrase = api_passphrase.to_s
         end
 
         def call env
           raise Kucoin::Api::MissingApiKeyError.new('API KEY not provided') if @api_key.empty?
           raise Kucoin::Api::MissingApiSecretError.new('API SECRET not provided') if @api_secret.empty?
+          raise Kucoin::Api::MissingApiPassphraseError.new('API PASSPHRASE not provided') if @api_passphrase.empty?
           env[:request_headers]['KC-API-KEY'] = @api_key
-          env[:request_headers]['KC-API-SIGNATURE'] = signature(env)
-          env.url.query = query_string(env)
+          env[:request_headers]['KC-API-SIGN'] = signature(env)
+          env[:request_headers]['KC-API-PASSPHRASE'] = @api_passphrase
           @app.call env
         end
 
         private
 
         def signature env
-          signature_str = Base64.strict_encode64(str_for_sign(env))
-          OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), @api_secret, signature_str)
+          Base64.strict_encode64(OpenSSL::HMAC.digest(OpenSSL::Digest.new('sha256'), @api_secret, str_to_sign(env)))
         end
 
-        def str_for_sign env
-          "#{env.url.path}/#{env[:request_headers]['KC-API-NONCE']}/#{query_string(env)}"
+        def str_to_sign env
+          "#{env[:request_headers]['KC-API-TIMESTAMP']}#{env.method.upcase}#{env.url.path}#{query_string(env)}"
         end
 
         def query_string env
@@ -36,7 +37,7 @@ module Kucoin
             params.merge!(::JSON.parse(env.body.to_s))
           rescue JSON::ParserError => e
           end
-          URI.encode_www_form(params.sort)
+          params.to_json
         end
       end
     end
