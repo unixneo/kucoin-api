@@ -2,7 +2,10 @@
 module Kucoin
   module Api
     module Endpoints
-      class User < Base; end
+      class User
+        class Deposits < User
+        end
+      end
     end
   end
 end

@@ -8,6 +8,9 @@ module Kucoin
       API_SECRET        = ENV['KUCOIN_API_SECRET'].to_s
       API_PASSPHRASE    = ENV['KUCOIN_API_PASSPHRASE'].to_s
 
+      extend Kucoin::Api::Endpoints
+      generate_endpoint_methods
+
       attr_reader :api_key, :api_secret, :api_passphrase
       attr_reader :adapter
 
@@ -22,14 +25,6 @@ module Kucoin
 
       def base_url
         sandbox? ? SANDBOX_BASE_URL : BASE_URL
-      end
-
-      Kucoin::Api::ENDPOINTS.keys.each do |endpoint_method|
-        endpoint_klass = Kucoin::Api::Endpoints.get_klass(endpoint_method)
-        define_method endpoint_method do
-          endpoint_var = "@#{endpoint_method}"
-          instance_variable_get(endpoint_var) || instance_variable_set(endpoint_var, endpoint_klass.new(self))
-        end
       end
 
       def open endpoint

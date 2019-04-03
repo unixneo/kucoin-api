@@ -2,7 +2,11 @@
 module Kucoin
   module Api
     module Endpoints
-      class User < Base; end
+      class Markets
+        class Symbols < Markets
+
+        end
+      end
     end
   end
 end

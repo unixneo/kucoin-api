@@ -2,7 +2,7 @@
 module Kucoin
   module Api
     module Endpoints
-      class User < Base; end
+      class Trade < Base; end
     end
   end
 end

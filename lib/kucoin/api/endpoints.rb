@@ -1,68 +1,120 @@
 # frozen_string_literal: true
+
+Dir[File.expand_path('endpoints/*.rb', File.dirname(__FILE__))].each {|file| require file }
+Dir[File.expand_path('endpoints/*/*.rb', File.dirname(__FILE__))].each {|file| require file }
+
 module Kucoin
   module Api
     ENDPOINTS = {
-      currency: {
-        all:                'api/v1/currencies',
-        update:             'v1/user/change-currency'
+      user:  {
+        accounts: {
+          create:           '/api/v1/accounts',
+          index:            '/api/v1/accounts',
+          history:          '/api/v1/hist-orders',
+          recent:           '/api/v1/orders/:order_id',
+          inner_transfer:   '/api/v1/accounts/inner-transfer',
+          # member
+          show:             '/api/v1/accounts/:account_id',
+          ledgers:          '/api/v1/accounts/:account_id/ledgers',
+          holds:            '/api/v1/accounts/:account_id/holds',
+        },
+        deposits: {
+          create:           '/api/v1/deposit-addresses',
+          index:            '/api/v1/deposits',
+          history:          '/api/v1/hist-deposits',
+          # member
+          show:             '/api/v1/deposit-addresses?currency=:currency',
+        },
+        withdrawals: {
+          create:           '/api/v1/withdrawals',
+          index:            '/api/v1/withdrawals',
+          history:          '/api/v1/hist-withdrawals',
+          quotas:           '/api/v1/withdrawals/quotas',
+          # member
+          delete:           '/api/v1/withdrawals/:withdrawal_id',
+        }
       },
-      language: {
-        all:                'v1/open/lang-list',
-        update:             'v1/user/change-lang'
+      trade:  {
+        orders: {
+          index:              '/api/v1/orders',
+          delete_all:         '/api/v1/orders',
+          history:            '/api/v1/hist-orders',
+          recent:             '/api/v1/orders/:order_id',
+          # member
+          create:             '/api/v1/orders',
+          show:               '/api/v1/orders/:order_id',
+          delete:             '/api/v1/orders/:order_id',
+        },
+        fills: {
+          index:              '/api/v1/fills',
+          recent:             '/api/v1/limit/fills',
+        }
       },
-      user: {
-        info:               'v1/user/info'
-      },
-      account: {
-        list:               'api/v1/accounts',
-        wallet_address:     'v1/account/:coin/wallet/address',
-        wallet_records:     'v1/account/:coin/wallet/records',
-        withdraw:           'v1/account/:coin/withdraw/apply',
-        cancel_withdraw:    'v1/account/:coin/withdraw/cancel',
-        balance:            'v1/account/:coin/balance',
-        balances:           'v1/account/balances',
-      },
-      order: {
-        create:             'v1/order?symbol=:symbol',
-        active:             'v1/order/active',
-        active_kv:          'v1/order/active-map',
-        cancel:             'v1/cancel-order?symbol=:symbol',
-        cancel_all:         'v1/order/cancel-all?symbol=:symbol',
-        dealt:              'v1/order/dealt',
-        specific_dealt:     'v1/deal-orders',
-        all:                'v1/orders',
-        detail:             'v1/order/detail',
-      },
-      market: {
-        # open
-        tick:               'v1/open/tick',
-        orders:             'v1/open/orders',
-        buy_orders:         'v1/open/orders-buy',
-        sell_orders:        'v1/open/orders-sell',
-        recent_deal_orders: 'v1/open/deal-orders',
-        trading:            'v1/open/markets',
-        trading_symbols:    'v1/market/open/symbols',
-        trading_coins:      'v1/market/open/coins-trending',
-        kline:              'v1/open/kline',
-        chart_config:       'v1/open/chart/config',
-        chart_symbols:      'v1/open/chart/symbols',
-        chart_history:      'v1/open/chart/history',
-        coin_info:          'v1/market/open/coin-info',
-        coins:              'v1/market/open/coins',
-        # auth
-        my_trading_symbols: 'v1/market/symbols',
-        stick_symbols:      'v1/market/stick-symbols',
-        favourite_symbols:  'v1/market/fav-symbols',
-        favourite_symbol:   'v1/market/symbol/fav',
-        stick_symbol:       'v1/market/symbol/stick',
+      markets: {
+        index:                '/api/v1/markets',
+        # member
+        stats:                '/api/v1/market/stats?symbol=:symbol',
+        symbols: {
+          index:              '/api/v1/symbols',
+        },
+        tickers: {
+          # member
+          inside:             '/api/v1/market/orderbook/level1?symbol=:symbol',
+        },
+        order_book: {
+          part_aggregated:    '/api/v1/market/orderbook/level2_20?symbol=:symbol',
+          full_aggregated:    '/api/v2/market/orderbook/level2?symbol=:symbol',
+          full_atomic:        '/api/v1/market/orderbook/level3?symbol=:symbol',
+        },
+        histories: {
+          trade:              '/api/v1/market/histories?symbol=:symbol',
+          klines:             '/api/v1/market/candles?symbol=:symbol'
+        },
+        currencies: {
+          index:              '/api/v1/currencies',
+          fiat:               '/api/v1/prices',
+          # member
+          show:               '/api/v1/currencies/:currency',
+        }
       },
       other: {
-        timestamp:          '/api/v1/timestamp'
+        timestamp:            '/api/v1/timestamp'
       }
     }
+
     module Endpoints
-      def self.get_klass name
-        Object.const_get("Kucoin::Api::Endpoints::#{name.to_s.split('_').map(&:capitalize).join}")
+      def self.get_klass name, parent=nil
+        Object.const_get("#{parent || 'Kucoin::Api::Endpoints'}::#{name.to_s.split('_').map(&:capitalize).join}")
+      end
+
+      def self.endpoint_method client_klass, name, result, parent_var = nil
+        child_endpoint_klass = Endpoints.get_klass(name, (parent_var && parent_var.class))
+
+        if parent_var
+          parent_var.define_singleton_method name do
+            endpoint_var = "@#{name}"
+            var = instance_variable_get(endpoint_var) || instance_variable_set(endpoint_var, child_endpoint_klass.new(parent_var.client))
+            client_klass.generate_endpoint_methods result: result, parent_var: var
+            var
+          end
+        else
+          client_klass.class_exec do
+            define_method name do
+              endpoint_var = "@#{name}"
+              var = instance_variable_get(endpoint_var) || instance_variable_set(endpoint_var, child_endpoint_klass.new(self))
+              client_klass.generate_endpoint_methods result: result, parent_var: var
+              var
+            end
+          end
+        end
+      end
+
+      def generate_endpoint_methods result: ENDPOINTS, parent_var: nil
+        result.each do |endpoint_name, _result|
+          if _result.is_a?(Hash)
+            Kucoin::Api::Endpoints.endpoint_method(self, endpoint_name, _result, parent_var)
+          end
+        end
       end
     end
   end

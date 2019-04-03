@@ -16,8 +16,11 @@ module Kucoin
           client.auth(self)
         end
 
-        def path(subpath)
-          Kucoin::Api::ENDPOINTS[self.class.name.downcase.split('::').last.to_sym][subpath]
+        def path path
+          path = path.to_s.split('/')
+          action, subpath = path.first.to_sym, path[1..-1]
+          path_array = (self.class.name.downcase.split('::')[3..-1] + subpath).map(&:to_sym)
+          path_array.reduce(Kucoin::Api::ENDPOINTS) { |m, k| m.fetch(k, {}) }[action]
         end
       end
     end

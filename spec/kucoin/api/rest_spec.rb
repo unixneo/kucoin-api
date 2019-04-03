@@ -1,5 +1,6 @@
 RSpec.describe Kucoin::Api::REST do
   let(:client) { described_class.new }
+  let(:endpoint) { Kucoin::Api::Endpoints::Base.new(client) }
   subject { client }
 
   it { expect(described_class::BASE_URL).to eq 'https://openapi-v2.kucoin.com' }
@@ -11,8 +12,29 @@ RSpec.describe Kucoin::Api::REST do
   describe "endpoint_methods" do
     Kucoin::Api::ENDPOINTS.keys.each do |endpoint_name|
       it "#{endpoint_name}" do
-        expect(subject.public_send(endpoint_name)).to be_a Kucoin::Api::Endpoints.get_klass(endpoint_name)
+        expect(subject.public_send(endpoint_name)).to be_a Kucoin::Api::Endpoints.get_klass(endpoint_name, nil)
         expect(subject.public_send(endpoint_name).client).to eq subject
+      end
+    end
+
+    Kucoin::Api::ENDPOINTS[:user].keys.each do |endpoint_name|
+      it "#{endpoint_name}" do
+        expect(subject.public_send(:user).public_send(endpoint_name)).to be_a Kucoin::Api::Endpoints.get_klass(endpoint_name, Kucoin::Api::Endpoints::User)
+        expect(subject.public_send(:user).public_send(endpoint_name).client).to eq subject
+      end
+    end
+
+    Kucoin::Api::ENDPOINTS[:trade].keys.each do |endpoint_name|
+      it "#{endpoint_name}" do
+        expect(subject.public_send(:trade).public_send(endpoint_name)).to be_a Kucoin::Api::Endpoints.get_klass(endpoint_name, Kucoin::Api::Endpoints::Trade)
+        expect(subject.public_send(:trade).public_send(endpoint_name).client).to eq subject
+      end
+    end
+
+    Kucoin::Api::ENDPOINTS[:markets].select {|x,v| v.is_a?(Hash) }.keys.each do |endpoint_name|
+      it "#{endpoint_name}" do
+        expect(subject.public_send(:markets).public_send(endpoint_name)).to be_a Kucoin::Api::Endpoints.get_klass(endpoint_name, Kucoin::Api::Endpoints::Markets)
+        expect(subject.public_send(:markets).public_send(endpoint_name).client).to eq subject
       end
     end
   end
@@ -28,7 +50,6 @@ RSpec.describe Kucoin::Api::REST do
   end
 
   describe '#open' do
-    let(:endpoint) { subject.account }
     it do
       expect(Kucoin::Api::REST::Connection).to receive(:new).with(endpoint, url: Kucoin::Api::REST::BASE_URL).and_call_original
       connection = subject.open(endpoint)
@@ -38,7 +59,6 @@ RSpec.describe Kucoin::Api::REST do
 
   describe '#auth' do
     let(:client) { described_class.new(api_key: 'foo', api_secret: 'bar') }
-    let(:endpoint) { subject.account }
     it do
       expect(Kucoin::Api::REST::Connection).to receive(:new).with(endpoint, url: Kucoin::Api::REST::BASE_URL).and_call_original
       connection = subject.auth(endpoint)

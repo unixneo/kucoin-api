@@ -13,7 +13,6 @@ require 'kucoin/api/middleware/nonce_request'
 require 'kucoin/api/websocket'
 
 require 'kucoin/api/endpoints'
-Dir[File.expand_path('api/endpoints/*.rb', File.dirname(__FILE__))].each {|file| require file }
 
 require 'kucoin/api/rest'
 require 'kucoin/api/rest/connection'
