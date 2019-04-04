@@ -42,7 +42,7 @@ RSpec.describe Kucoin::Api::Middleware::AuthRequest do
         let(:api_secret) { 'secret_bar' }
         it 'add Signature' do
           expect(env[:request_headers]["KC-API-KEY"]).to eq 'key_foo'
-          expect(env[:request_headers]["KC-API-SIGN"]).to eq 'ya6HG42hRijkCxoQt0TgoVlLtm35GTfiyyHS5XvyHY0='
+          expect(env[:request_headers]["KC-API-SIGN"]).to eq '5HXeVm4ZBjqRv+7L6xYWcsvKWzeLgZUxhtNcdlIVM/k='
           expect(env.url.query).to eq nil
         end
       end

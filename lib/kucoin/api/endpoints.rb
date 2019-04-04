@@ -21,14 +21,12 @@ module Kucoin
         deposits: {
           create:           '/api/v1/deposit-addresses',
           index:            '/api/v1/deposits',
-          history:          '/api/v1/hist-deposits',
           # member
           show:             '/api/v1/deposit-addresses?currency=:currency',
         },
         withdrawals: {
           create:           '/api/v1/withdrawals',
           index:            '/api/v1/withdrawals',
-          history:          '/api/v1/hist-withdrawals',
           quotas:           '/api/v1/withdrawals/quotas',
           # member
           delete:           '/api/v1/withdrawals/:withdrawal_id',
@@ -38,8 +36,7 @@ module Kucoin
         orders: {
           index:              '/api/v1/orders',
           delete_all:         '/api/v1/orders',
-          history:            '/api/v1/hist-orders',
-          recent:             '/api/v1/orders/:order_id',
+          recent:             '/api/v1/limit/orders',
           # member
           create:             '/api/v1/orders',
           show:               '/api/v1/orders/:order_id',

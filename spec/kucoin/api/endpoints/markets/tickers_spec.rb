@@ -2,6 +2,7 @@ RSpec.describe Kucoin::Api::Endpoints::Markets::Tickers, type: :endpoint do
   describe '#index' do
     let(:request_path) { '/api/v1/market/allTickers' }
     it { expect(subject.index).to eq({"foo"=>"bar"}) }
+    it { expect(subject.method(:index) == subject.method(:all)).to be_truthy }
   end
 
   describe '#inside' do

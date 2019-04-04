@@ -134,6 +134,68 @@ names, aliases (if any) and parameters of the methods to access endpoints.  For 
 of the endpoint's URL and alias method follows the title/name given in Kucoin API documentation.  There were some deviations
 where there would otherwise be name clashes/overloading.
 
+#### Trade
+
+##### Orders
+----
+
+```ruby
+# Place a new order
+trade.orders.place client_oid, side, symbol, options={}
+```
+* required params: client_oid, side, symbol
+
+----
+```ruby
+# Cancel an order
+trade.orders.cancel order_id
+```
+* required params: order_id
+
+----
+```ruby
+# Cancel all orders
+trade.orders.cancel_all options={}
+```
+* required params: none
+
+----
+```ruby
+# List Orders
+trade.orders.list options={}
+```
+* required params: none
+
+----
+```ruby
+# Recent Orders
+trade.orders.recent
+```
+* required params: none
+
+----
+```ruby
+# Get an order
+trade.orders.get order_id
+```
+* required params: order_id
+
+##### Fills
+----
+
+```ruby
+# List Fills
+trade.fills.list
+```
+* required params: none
+
+----
+```ruby
+# Recent Fills
+trade.fills.recent
+```
+* required params: none
+
 #### Market Data
 
 ##### Symbols & Ticker

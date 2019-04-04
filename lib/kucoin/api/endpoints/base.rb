@@ -38,6 +38,16 @@ module Kucoin
           return if valid_values.include? options[param].to_s
           raise Kucoin::Api::InvalidParamError.new("#{param} must be one of #{valid_values.inspect}")
         end
+
+        private
+
+        def side_types
+          %w(buy sell)
+        end
+
+        def order_types
+          %w(limit market)
+        end
       end
     end
   end

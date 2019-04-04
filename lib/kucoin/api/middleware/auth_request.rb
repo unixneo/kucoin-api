@@ -37,7 +37,7 @@ module Kucoin
             params.merge!(::JSON.parse(env.body.to_s))
           rescue JSON::ParserError => e
           end
-          params.to_json
+          params.empty? ? '' : params.to_json
         end
       end
     end
