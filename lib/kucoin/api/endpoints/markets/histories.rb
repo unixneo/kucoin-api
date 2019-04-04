@@ -8,8 +8,8 @@ module Kucoin
             open.ku_request :get, :trade, symbol: symbol
           end
 
-          def klines symbol, options={}
-            open.ku_request :get, :klines, symbol: symbol, **options
+          def klines symbol, type, options={}
+            open.ku_request :get, :klines, symbol: symbol, type: type, **options
           end
         end
       end

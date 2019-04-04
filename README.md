@@ -134,262 +134,112 @@ names, aliases (if any) and parameters of the methods to access endpoints.  For 
 of the endpoint's URL and alias method follows the title/name given in Kucoin API documentation.  There were some deviations
 where there would otherwise be name clashes/overloading.
 
-#### Currencies Plugin
+#### Market Data
+
+##### Symbols & Ticker
+----
+
+```ruby
+# Get Symbols List
+markets.all
+```
+* required params: none
 
 ----
 ```ruby
-currency.all
+# Get Ticker
+markets.stats symbol
 ```
-* required params: none
+* required params: symbol
+
 ----
 ```ruby
-currency.update currency
+# Get All Tickers
+markets.tickers.all
+```
+* required params: none
+
+----
+```ruby
+# Get 24hr Stats
+markets.tickers.inside symbol
+```
+* required params: symbol
+
+----
+```ruby
+# Get Market List
+markets.symbols.all options={}
+```
+* required params: none
+
+##### Order Book
+----
+
+```ruby
+# Get Part Order Book(aggregated)
+markets.order_book.part symbol, depth
+```
+* required params: symbol, depth(20, 100)
+
+----
+```ruby
+# Get Full Order Book(aggregated)
+markets.order_book.full_aggregated symbol
+```
+* required params: symbol
+
+----
+```ruby
+# Get Full Order Book(atomic)
+markets.order_book.full_atomic symbol
+```
+* required params: symbol
+
+##### Histories
+----
+
+```ruby
+# Get Trade Histories
+markets.histories.trade symbol
+```
+* required params: symbol
+
+----
+```ruby
+# Get Klines
+markets.histories.klines symbol, type, options={}
+```
+* required params: symbol, type
+
+##### Currencies
+----
+
+```ruby
+# Get Currencies
+markets.currencies.all
+```
+* required params: none
+
+----
+```ruby
+# Get Currency Detail
+markets.currencies.detail currency
 ```
 * required params: currency
 
-
-#### Language
-
 ----
 ```ruby
-language.all
-```
-* required params: none
-----
-```ruby
-language.update lang
-```
-* required params: lang
-
-#### User
-
-----
-```ruby
-user.info
-```
-* required params: none
-
-#### Assets Operation
-
-----
-```ruby
-# Get coin deposit address
-account.wallet_address coin
-```
-* required params: coin
-----
-```ruby
-# Create withdrawal apply
-account.withdraw coin, options={}
-```
-* required params: coin
-----
-```ruby
-# Cancel withdrawal
-account.wallet_records coin, options={}
-```
-* required params: coin, type, status
-----
-```ruby
-# List deposit & withdrawal records
-account.wallet_records coin, options={}
-```
-* required params: coin, type, status
-----
-```ruby
-# Get balance of coin
-account.balance coin
-```
-* required params: coin
-----
-```ruby
-# Get balance by page
-account.balances options={}
-```
-* required params: none
-
-#### Trading
-
-----
-```ruby
-# Create an order
-order.create symbol, options={}
-```
-* required params: symbol, type, price, amount
-----
-```ruby
-# List active orders
-order.active symbol, options={}
-```
-* required params: symbol
-----
-```ruby
-# List active orders in kv format
-order.active_kv symbol, options={}
-```
-* required params: symbol
-----
-```ruby
-# Cancel orders
-order.cancel symbol, options={}
-```
-* required params: symbol, orderOid, type
-----
-```ruby
-# Cancel all orders
-order.cancel_all symbol, options={}
-```
-* required params: symbol
-----
-```ruby
-# List dealt orders
-order.dealt options={}
-```
-* required params: none
-----
-```ruby
-# List dealt orders(specific symbol)
-order.specific_dealt symbol, options={}
-```
-* required params: symbol
-----
-```ruby
-# List all orders
-order.all symbol, options={}
-```
-* required params: symbol, direction
-----
-```ruby
-# Order details
-account.detail symbol, options={}
-```
-* required params: symbol, type, orderOid
-
-#### Public Market Data
-
-----
-```ruby
-# Tick(Open)
-market.tick options={}
-```
-* required params: none
-----
-```ruby
-# Order books(Open)
-market.orders symbol, options={}
-```
-* required params: symbol
-----
-```ruby
-# Buy Order Books(Open)
-market.buy_orders symbol, options={}
-```
-* required params: symbol
-----
-```ruby
-# Sell Order Books(Open)
-market.sell_orders symbol, options={}
-```
-* required params: symbol
-----
-```ruby
-# Recently deal orders(Open)
-market.recent_deal_orders symbol, options={}
-```
-* required params: symbol
-----
-```ruby
-# List trading markets(Open)
-market.trading
-```
-* required params: none
-----
-```ruby
-# List trading symbols tick (Open)
-market.trading_symbols options={}
-```
-* required params: none
-----
-```ruby
-# List trendings(Open)
-market.trading_coins options={}
-```
-* required params: none
-----
-```ruby
-# Get kline data(Open)
-market.kline symbol, options={}
-```
-* required params: symbol
-----
-```ruby
-# Get kline config(Open, TradingView Version)
-market.chart_config
-```
-* required params: none
-----
-```ruby
-# Get symbol tick(Open, TradingView Version)
-market.chart_symbols symbol
-```
-* required params: none
-----
-```ruby
-# Get kline data(Open, TradingView Version)
-market.chart_history options={}
-```
-* required params: none
-----
-```ruby
-# Get coin info(Open)
-market.coin_info coin
-```
-* required params: coin
-----
-```ruby
-# List coins(Open)
-market.coins
-```
-* required params: none
-
-#### Market Data For authrozied User
-
-----
-```ruby
-# List trading symbols tick
-market.my_trading_symbols options={}
-```
-* required params: none
-----
-```ruby
-# Get stick symbols
-market.stick_symbols
-```
-* required params: none
-----
-```ruby
-# Get favourite symbols
-market.favourite_symbols
-```
-* required params: none
-----
-```ruby
-# Add/Remove favourite symbol
-market.stick_symbol symbol, options={}
-```
-* required params: none
-----
-```ruby
-# Add/Remove stick symbol
-market.favourite_symbol symbol, options={}
+# Get Fiat Price
+markets.currencies.fiat options= {}
 ```
 * required params: none
 
 #### Other
 
 ##### Time
-
 ----
+
 ```ruby
 # Server Time
 other.timestamp

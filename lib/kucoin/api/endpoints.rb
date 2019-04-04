@@ -59,10 +59,11 @@ module Kucoin
         },
         tickers: {
           # member
+          index:              '/api/v1/market/allTickers',
           inside:             '/api/v1/market/orderbook/level1?symbol=:symbol',
         },
         order_book: {
-          part_aggregated:    '/api/v1/market/orderbook/level2_20?symbol=:symbol',
+          part_aggregated:    '/api/v1/market/orderbook/level2_:depth?symbol=:symbol',
           full_aggregated:    '/api/v2/market/orderbook/level2?symbol=:symbol',
           full_atomic:        '/api/v1/market/orderbook/level3?symbol=:symbol',
         },

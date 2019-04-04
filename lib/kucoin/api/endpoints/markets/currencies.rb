@@ -7,6 +7,7 @@ module Kucoin
           def index options={}
             open.ku_request :get, :index, options
           end
+          alias all index
 
           def fiat options= {}
             open.ku_request :get, :fiat, options
@@ -15,6 +16,7 @@ module Kucoin
           def show currency
             open.ku_request :get, :show, currency: currency
           end
+          alias detail show
         end
       end
     end

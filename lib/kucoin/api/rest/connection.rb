@@ -13,7 +13,7 @@ module Kucoin
           response = client.public_send(method) do |req|
 
             # substitute path parameters and remove from options hash
-            endpoint_url = endpoint.path(subpath).dup
+            endpoint_url = endpoint.url(subpath).dup
             options.each do |option, value|
               path_param = /:#{option}/
               if endpoint_url.match? path_param

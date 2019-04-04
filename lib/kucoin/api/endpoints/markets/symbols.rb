@@ -4,7 +4,10 @@ module Kucoin
     module Endpoints
       class Markets
         class Symbols < Markets
-
+          def index options={}
+            open.ku_request :get, :index, **options
+          end
+          alias all index
         end
       end
     end

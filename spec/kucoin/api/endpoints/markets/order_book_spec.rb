@@ -1,107 +1,23 @@
 RSpec.describe Kucoin::Api::Endpoints::Markets::OrderBook, type: :endpoint do
-end
+  describe '#part' do
+    let(:request_path) { '/api/v1/market/orderbook/level2_20?symbol=BTC-USDT' }
+    it { expect(subject.part('BTC-USDT', '20')).to eq({"foo"=>"bar"}) }
+    context '100' do
+      let(:request_path) { '/api/v1/market/orderbook/level2_100?symbol=BTC-USDT' }
+      it { expect(subject.part('BTC-USDT', '100')).to eq({"foo"=>"bar"}) }
+    end
+    context 'in valid depth' do
+      it { expect { subject.part('BTC-USDT', 'foo') }.to raise_error(Kucoin::Api::InvalidParamError) }
+    end
+  end
 
-# TODO : remove
-# describe '#tick' do
-#   let(:request_path)     { '/v1/open/tick' }
-#   it { expect(subject.tick).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#orders' do
-#   let(:request_path)     { '/v1/open/orders?symbol=ETH-BTC' }
-#   it { expect(subject.orders('ETH-BTC')).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#buy_orders' do
-#   let(:request_path)     { '/v1/open/orders-buy?symbol=ETH-BTC' }
-#   it { expect(subject.buy_orders('ETH-BTC')).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#sell_orders' do
-#   let(:request_path)     { '/v1/open/orders-sell?symbol=ETH-BTC' }
-#   it { expect(subject.sell_orders('ETH-BTC')).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#recent_deal_orders' do
-#   let(:request_path)     { '/v1/open/deal-orders?symbol=ETH-BTC' }
-#   it { expect(subject.recent_deal_orders('ETH-BTC')).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#trading' do
-#   let(:request_path)     { '/v1/open/markets' }
-#   it { expect(subject.trading).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#trading_symbols' do
-#   let(:request_path)     { '/v1/market/open/symbols' }
-#   it { expect(subject.trading_symbols).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#trading_coins' do
-#   let(:request_path)     { '/v1/market/open/coins-trending' }
-#   it { expect(subject.trading_coins).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#kline' do
-#   let(:request_path)     { '/v1/open/kline?symbol=ETH-BTC' }
-#   it { expect(subject.kline('ETH-BTC')).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#chart_config' do
-#   let(:request_path)     { '/v1/open/chart/config' }
-#   it { expect(subject.chart_config).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#chart_symbols' do
-#   let(:request_path)     { '/v1/open/chart/symbols?symbol=ETH-BTC' }
-#   it { expect(subject.chart_symbols('ETH-BTC')).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#chart_history' do
-#   let(:request_path)     { '/v1/open/chart/history' }
-#   it { expect(subject.chart_history).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#coin_info' do
-#   let(:request_path)     { '/v1/market/open/coin-info?coin=BTC' }
-#   it { expect(subject.coin_info('BTC')).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#coins' do
-#   let(:request_path)     { '/v1/market/open/coins' }
-#   it { expect(subject.coins).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#my_trading_symbols' do
-#   let(:auth_request)    { true }
-#   let(:request_path)    { '/v1/market/symbols' }
-#   it { expect(subject.my_trading_symbols).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#stick_symbols' do
-#   let(:auth_request)    { true }
-#   let(:request_path)    { '/v1/market/stick-symbols' }
-#   it { expect(subject.stick_symbols).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#favourite_symbols' do
-#   let(:auth_request)    { true }
-#   let(:request_path)    { '/v1/market/fav-symbols' }
-#   it { expect(subject.favourite_symbols).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#stick_symbol' do
-#   let(:auth_request)    { true }
-#   let(:request_path)    { '/v1/market/symbol/stick' }
-#   let(:request_method)  { :post }
-#   let(:request_body)    { "{\"symbol\":\"ETH-BTC\"}" }
-#   it { expect(subject.stick_symbol('ETH-BTC')).to eq({"foo"=>"bar"}) }
-# end
-#
-# describe '#favourite_symbol' do
-#   let(:auth_request)    { true }
-#   let(:request_path)    { '/v1/market/symbol/fav' }
-#   let(:request_method)  { :post }
-#   let(:request_body)    { "{\"symbol\":\"ETH-BTC\"}" }
-#   it { expect(subject.favourite_symbol('ETH-BTC')).to eq({"foo"=>"bar"}) }
-# end
+  describe '#full_aggregated' do
+    let(:request_path) { '/api/v2/market/orderbook/level2?symbol=BTC-USDT' }
+    it { expect(subject.full_aggregated('BTC-USDT')).to eq({"foo"=>"bar"}) }
+  end
+
+  describe '#full_atomic' do
+    let(:request_path) { '/api/v1/market/orderbook/level3?symbol=BTC-USDT' }
+    it { expect(subject.full_atomic('BTC-USDT')).to eq({"foo"=>"bar"}) }
+  end
+end
