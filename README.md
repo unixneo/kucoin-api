@@ -134,6 +134,106 @@ names, aliases (if any) and parameters of the methods to access endpoints.  For 
 of the endpoint's URL and alias method follows the title/name given in Kucoin API documentation.  There were some deviations
 where there would otherwise be name clashes/overloading.
 
+
+#### User
+
+##### Accounts
+----
+
+```ruby
+# List Accounts
+user.accounts.list options={}
+```
+* required params: none
+
+----
+```ruby
+# Get an Account
+user.accounts.get account_id
+```
+* required params: account_id
+
+----
+```ruby
+# Create an Account
+user.accounts.create currency, type
+```
+* required params: currency, type
+
+----
+```ruby
+# Get Account Ledgers
+user.accounts.ledgers account_id, options={}
+```
+* required params: account_id
+
+----
+```ruby
+# Get Holds
+user.accounts.holds account_id
+```
+* required params: account_id
+
+----
+```ruby
+# Inner Transfer
+user.accounts.inner_transfer client_oid, pay_account_id, rec_account_id, amount
+```
+* required params: client_oid, pay_account_id, rec_account_id, amount
+
+##### Deposits
+----
+
+```ruby
+# Create Deposit Address
+user.deposits.create currency
+```
+* required params: currency
+
+----
+```ruby
+# Get Deposit Address
+user.deposits.get currency
+```
+* required params: currency
+
+----
+```ruby
+# Get Deposit List
+user.deposits.list options={}
+```
+* required params: none
+
+##### Withdrawals
+----
+
+```ruby
+# Get Withdrawals List
+user.withdrawals.list options={}
+```
+* required params: none
+
+----
+```ruby
+# Get Withdrawal Quotas
+user.withdrawals.quotas currency
+```
+* required params: currency
+
+----
+```ruby
+# Apply Withdraw
+user.withdrawals.apply currency, address, amount, options={}
+```
+* required params: currency, address, amount
+
+----
+```ruby
+# Cancel Withdrawal
+user.withdrawals.cancel withdrawal_id
+```
+* required params: withdrawal_id
+
 #### Trade
 
 ##### Orders

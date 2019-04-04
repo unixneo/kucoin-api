@@ -48,6 +48,10 @@ module Kucoin
         def order_types
           %w(limit market)
         end
+
+        def account_types
+          %w(main trade)
+        end
       end
     end
   end

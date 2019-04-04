@@ -8,10 +8,7 @@ module Kucoin
     ENDPOINTS = {
       user:  {
         accounts: {
-          create:           '/api/v1/accounts',
           index:            '/api/v1/accounts',
-          history:          '/api/v1/hist-orders',
-          recent:           '/api/v1/orders/:order_id',
           inner_transfer:   '/api/v1/accounts/inner-transfer',
           # member
           show:             '/api/v1/accounts/:account_id',
@@ -25,7 +22,6 @@ module Kucoin
           show:             '/api/v1/deposit-addresses?currency=:currency',
         },
         withdrawals: {
-          create:           '/api/v1/withdrawals',
           index:            '/api/v1/withdrawals',
           quotas:           '/api/v1/withdrawals/quotas',
           # member
@@ -35,12 +31,9 @@ module Kucoin
       trade:  {
         orders: {
           index:              '/api/v1/orders',
-          delete_all:         '/api/v1/orders',
           recent:             '/api/v1/limit/orders',
           # member
-          create:             '/api/v1/orders',
           show:               '/api/v1/orders/:order_id',
-          delete:             '/api/v1/orders/:order_id',
         },
         fills: {
           index:              '/api/v1/fills',

@@ -51,7 +51,7 @@ RSpec.describe Kucoin::Api::Middleware::AuthRequest do
         let(:endpoint_url) { URI('http://example.com/endpoint?flower=6&cat=3') }
         it 'add Signature' do
           expect(env[:request_headers]["KC-API-KEY"]).to eq 'foo'
-          expect(env[:request_headers]["KC-API-SIGN"]).to eq 'tljm9hZWIp9T7LyaQqbQLRZPGwjTxO+LUY6visU38jk='
+          expect(env[:request_headers]["KC-API-SIGN"]).to eq 'E8Q387na3it/sKmp9pyi+RJ22DQ7gjPERraX+lqHDLU='
           expect(env.url.query).to eq 'flower=6&cat=3'
         end
       end
@@ -61,7 +61,7 @@ RSpec.describe Kucoin::Api::Middleware::AuthRequest do
         let(:body) { '{"ball": 2, "apple": 1, "cat": 6, "eye": 5, "dog": 4}' }
         it 'add Signature' do
           expect(env[:request_headers]["KC-API-KEY"]).to eq 'foo'
-          expect(env[:request_headers]["KC-API-SIGN"]).to eq 'c3PGkFoJH4lBYCaw3CH91ZyRKQc2tdbpxIGuogh/KhU='
+          expect(env[:request_headers]["KC-API-SIGN"]).to eq 'c5DSA7letF79uUerAxNJFUpp4Nk5MwtbFzRSm4b9q5w='
           expect(env.url.query).to eq 'flower=6&cat=3'
           expect(env.body).to eq '{"ball": 2, "apple": 1, "cat": 6, "eye": 5, "dog": 4}'
         end
@@ -72,7 +72,7 @@ RSpec.describe Kucoin::Api::Middleware::AuthRequest do
       let(:endpoint_url) { URI('http://example.com/endpoint?flower=6&cat=3') }
       let(:body) { '{"ball": 2, "apple": 1, "cat": 6, "eye": 5, "dog": 4}' }
       it 'generate path for signature' do
-        expect(subject.send(:str_to_sign, env)).to eq '1554196634670POST/endpoint{"flower":"6","cat":6,"ball":2,"apple":1,"eye":5,"dog":4}'
+        expect(subject.send(:str_to_sign, env)).to eq '1554196634670POST/endpoint?flower=6&cat=3{"ball":2,"apple":1,"cat":6,"eye":5,"dog":4}'
       end
     end
 
@@ -80,7 +80,7 @@ RSpec.describe Kucoin::Api::Middleware::AuthRequest do
       let(:endpoint_url) { URI('http://example.com/endpoint?flower=6&cat=3') }
       let(:body) { '{"ball": 2, "apple": 1, "cat": 6, "eye": 5, "dog": 4}' }
       it 'sort query and body params' do
-        expect(subject.send(:query_string, env)).to eq '{"flower":"6","cat":6,"ball":2,"apple":1,"eye":5,"dog":4}'
+        expect(subject.send(:query_string, env)).to eq '{"ball":2,"apple":1,"cat":6,"eye":5,"dog":4}'
       end
     end
   end

@@ -27,12 +27,11 @@ module Kucoin
         end
 
         def str_to_sign env
-          "#{env[:request_headers]['KC-API-TIMESTAMP']}#{env.method.upcase}#{env.url.path}#{query_string(env)}"
+          "#{env[:request_headers]['KC-API-TIMESTAMP']}#{env.method.upcase}#{env.url.request_uri}#{query_string(env)}"
         end
 
         def query_string env
-          return @query_string if @query_string
-          params = ::Hash[URI.decode_www_form(env.url.query.to_s)]
+          params = {}
           begin
             params.merge!(::JSON.parse(env.body.to_s))
           rescue JSON::ParserError => e

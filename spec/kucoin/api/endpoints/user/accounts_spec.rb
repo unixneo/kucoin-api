@@ -1,51 +1,39 @@
 RSpec.describe Kucoin::Api::Endpoints::User::Accounts, type: :endpoint do
-end
+  describe '#create' do
+    let(:request_path)    { '/api/v1/accounts' }
+    let(:request_method)  { :post }
+    let(:request_body)    { "{\"currency\":\"ETH\",\"type\":\"trade\"}" }
+    it { expect(subject.create('ETH', 'trade')).to eq({"foo"=>"bar"}) }
+  end
 
-# TODO : remove
-# RSpec.describe Kucoin::Api::Endpoints::Account, type: :endpoint do
-#   describe '#wallet_address' do
-#     let(:auth_request)  { true }
-#     let(:request_path)  { '/api/v1/accounts' }
-#     it { expect(subject.list).to eq({"foo"=>"bar"}) }
-#   end
-#
-#   describe '#wallet_address' do
-#     let(:auth_request)  { true }
-#     let(:request_path)  { '/v1/account/BTC/wallet/address' }
-#     it { expect(subject.wallet_address('BTC')).to eq({"foo"=>"bar"}) }
-#   end
-#
-#   describe '#wallet_records' do
-#     let(:auth_request) { true }
-#     let(:request_path) { '/v1/account/BTC/wallet/records' }
-#     it { expect(subject.wallet_records('BTC')).to eq({"foo"=>"bar"}) }
-#   end
-#
-#   describe '#withdraw' do
-#     let(:auth_request)    { true }
-#     let(:request_path)    { '/v1/account/BTC/withdraw/apply' }
-#     let(:request_method)  { :post }
-#     let(:request_body)    { {} }
-#     it { expect(subject.withdraw('BTC')).to eq({"foo"=>"bar"}) }
-#   end
-#
-#   describe '#cancel_withdraw' do
-#     let(:auth_request)    { true }
-#     let(:request_path)    { '/v1/account/BTC/withdraw/cancel' }
-#     let(:request_method)  { :post }
-#     let(:request_body)    { {} }
-#     it { expect(subject.cancel_withdraw('BTC')).to eq({"foo"=>"bar"}) }
-#   end
-#
-#   describe '#balance' do
-#     let(:auth_request)  { true }
-#     let(:request_path)  { '/v1/account/BTC/balance' }
-#     it { expect(subject.balance('BTC')).to eq({"foo"=>"bar"}) }
-#   end
-#
-#   describe '#balances' do
-#     let(:auth_request)  { true }
-#     let(:request_path)  { '/v1/account/balances' }
-#     it { expect(subject.balances).to eq({"foo"=>"bar"}) }
-#   end
-# end
+  describe '#index' do
+    let(:request_path) { '/api/v1/accounts' }
+    it { expect(subject.index).to eq({"foo"=>"bar"}) }
+    it { expect(subject.method(:index) == subject.method(:all)).to be_truthy }
+    it { expect(subject.method(:index) == subject.method(:list)).to be_truthy }
+  end
+
+  describe '#inner_transfer' do
+    let(:request_path)    { '/api/v1/accounts/inner-transfer' }
+    let(:request_method)  { :post }
+    let(:request_body)    { "{\"clientOid\":\"t1\",\"payAccountId\":\"payId\",\"recAccountId\":\"recId\",\"amount\":10}" }
+    it { expect(subject.inner_transfer('t1', 'payId', 'recId', 10)).to eq({"foo"=>"bar"}) }
+  end
+
+  describe '#show' do
+    let(:request_path) { '/api/v1/accounts/123' }
+    it { expect(subject.show(123)).to eq({"foo"=>"bar"}) }
+    it { expect(subject.method(:show) == subject.method(:get)).to be_truthy }
+    it { expect(subject.method(:show) == subject.method(:detail)).to be_truthy }
+  end
+
+  describe '#ledgers' do
+    let(:request_path) { '/api/v1/accounts/123/ledgers' }
+    it { expect(subject.ledgers(123)).to eq({"foo"=>"bar"}) }
+  end
+
+  describe '#holds' do
+    let(:request_path) { '/api/v1/accounts/123/holds' }
+    it { expect(subject.holds(123)).to eq({"foo"=>"bar"}) }
+  end
+end
