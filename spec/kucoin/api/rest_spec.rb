@@ -5,9 +5,6 @@ RSpec.describe Kucoin::Api::REST do
 
   it { expect(described_class::BASE_URL).to eq 'https://openapi-v2.kucoin.com' }
   it { expect(described_class::SANDBOX_BASE_URL).to eq 'https://openapi-sandbox.kucoin.com' }
-  it { expect(described_class::API_KEY).to eq '' }
-  it { expect(described_class::API_SECRET).to eq '' }
-  it { expect(described_class::API_PASSPHRASE).to eq '' }
 
   describe "endpoint_methods" do
     Kucoin::Api::ENDPOINTS.keys.each do |endpoint_name|

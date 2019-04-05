@@ -70,6 +70,11 @@ module Kucoin
       },
       other: {
         timestamp:            '/api/v1/timestamp'
+      },
+
+      websocket: {
+        public:                '/api/v1/bullet-public',
+        private:               '/api/v1/bullet-private'
       }
     }
 

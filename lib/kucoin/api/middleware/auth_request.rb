@@ -31,12 +31,13 @@ module Kucoin
         end
 
         def query_string env
+          return if [:get, :delete].include?(env.method.to_sym)
           params = {}
           begin
             params.merge!(::JSON.parse(env.body.to_s))
           rescue JSON::ParserError => e
           end
-          params.empty? ? '' : params.to_json
+          params.to_json
         end
       end
     end

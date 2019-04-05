@@ -18,5 +18,17 @@ require 'kucoin/api/rest'
 require 'kucoin/api/rest/connection'
 
 module Kucoin
-  module Api; end
+  module Api
+    def self.default_key
+      ENV['KUCOIN_API_KEY'].to_s
+    end
+
+    def self.default_secret
+      ENV['KUCOIN_API_SECRET'].to_s
+    end
+
+    def self.default_passphrase
+      ENV['KUCOIN_API_PASSPHRASE'].to_s
+    end
+  end
 end

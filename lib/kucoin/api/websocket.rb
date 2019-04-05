@@ -3,19 +3,18 @@
 module Kucoin
   module Api
     class Websocket
-      USERCENTER_LOGIC_URL = 'https://kitchen.kucoin.com/v1/bullet/usercenter/loginUser?protocol=websocket&encrypt=true'.freeze
+      attr_reader :rest_client
 
-      attr_reader :bullet_token, :endpoint, :id, :ping_interval
+      def initialize rest_client: Kucoin::Api::REST.new
+        @rest_client = rest_client
+      end
 
-      def initialize
-        response = Faraday.get(USERCENTER_LOGIC_URL)
-        if response.status == 200
-          data = JSON.parse(response.body)["data"]
-          @bullet_token = data["bulletToken"]
-          @endpoint = data["instanceServers"][0]["endpoint"]
-          @id = rand Time.now.to_i
-          @ping_interval = data["instanceServers"][0]["pingInterval"]
-        end
+      def open_stream methods:
+        create_stream(rest_client.websocket.public, methods: methods)
+      end
+
+      def auth_stream methods:
+        create_stream(rest_client.websocket.private, methods: methods)
       end
 
       # Public: Create a WebSocket stream
@@ -30,54 +29,31 @@ module Kucoin
       #   :error   - The Proc called when a stream receives an error (optional)
       #   :close   - The Proc called when a stream is closed (optional)
       def start stream:, methods:
-        channel = create_stream("#{endpoint}?bulletToken=#{bullet_token}&format=json&resource=api", methods: methods)
-        params = {id: id, type: "subscribe", topic: stream[:topic]}
+        stream = { id: rand(Time.now.to_i), privateChannel: false, response: true }.merge(stream)
+        channel = stream[:privateChannel] ? auth_stream(methods: methods) : open_stream(methods: methods)
+        params = {id: stream[:id], type: 'subscribe', topic: stream[:topic], privateChannel: stream[:privateChannel], response: stream[:response]}
         channel.send(params.to_json)
         return channel
       end
 
-      # We can subscribe "/trade/{symbol}_TRADE" to get orderbook level2
-      # incremental data. {symbol} can be replaced by ETH-BTC or BTC-USDT and
-      # so on. We need to get the initial data through the REST API before we
-      # can process the incremental data. In the future, we will limit REST
-      # API access frequency to 5 times per second per single IP.
-      #
-      # {"id":123, "type":"subscribe", "topic":"/trade/ETH-BTC_TRADE", "req":1}
-      def orderbook symbol:, methods:
-        start stream: { topic: "/trade/#{symbol}_TRADE" }, methods: methods
+      def ticker symbols:, methods:
+        start stream: { topic: topic_path('/market/ticker', symbols) }, methods: methods
       end
 
-      # We can subscribe "/trade/{symbol}_HISTORY" to get history info.
-      # {symbol} can be replaced by ETH-BTC or BTC-USDT and so on. We need to
-      # get the initial data through the REST API before we can process the
-      # incremental data. In the future, we will limit REST API access
-      # frequency to 5 times per second per single IP.
-      #
-      # {"id":123, "type":"subscribe", "topic":"/trade/ETH-BTC_HISTORY", "req":1}
-      def history symbol:, methods:
-        start stream: { topic: "/trade/#{symbol}_HISTORY" }, methods: methods
+      def all_ticker methods:
+        ticker symbols: :all, methods: methods
       end
 
-      # TickWe can subscribe "/market/{symbol}_TICK" to get history info.
-      # {symbol} can be replaced by ETH-BTC or BTC-USDT and so on. We need to
-      # get the initial data through the REST API before we can process the
-      # incremental data. In the future, we will limit REST API access
-      # frequency to 5 times per second per single IP
-      #
-      # {"id":123, "type":"subscribe", "topic":"/market/ETH-BTC_TICK", "req":1}
-      def tick symbol:, methods:
-        start stream: { topic: "/market/#{symbol}_TICK" }, methods: methods
+      def stop_order_received_event symbols: , methods:
+        start stream: { topic: topic_path('/market/level3', symbols) }, methods: methods
       end
 
-      # We can subscribe "/market/{market}" to get history info. {market} can
-      # be replaced by ETH or USDT and so on. We need to get the initial data
-      # through the REST API before we can process the incremental data. In
-      # the future, we will limit REST API access frequency to 5 times per
-      # second per single IP.
-      #
-      # {"id":123, "type":"subscribe", "topic":"/market/BTC", "req":1}
-      def market symbol:, methods:
-        start stream: { topic: "/market/#{symbol}" }, methods: methods
+      def stop_order_activate_event symbols: , methods:
+        start stream: { topic: topic_path('/market/level3', symbols) }, methods: methods
+      end
+
+      def balance methods:
+        start stream: { topic: '/account/balance', privateChannel: true }, methods: methods
       end
 
       private
@@ -92,8 +68,8 @@ module Kucoin
       #   :message - The Proc called when a stream receives a message
       #   :error   - The Proc called when a stream receives an error (optional)
       #   :close   - The Proc called when a stream is closed (optional)
-      def create_stream url, methods:
-        Faye::WebSocket::Client.new(url, [], ping: ping_interval).tap { |ws| attach_methods(ws, methods) }
+      def create_stream response, methods:
+        Faye::WebSocket::Client.new("#{response.endpoint}?token=#{response.token}", [], ping: response.ping_interval).tap { |ws| attach_methods(ws, methods) }
       end
 
       # Internal: Iterate through methods passed and add them to the WebSocket
@@ -110,6 +86,11 @@ module Kucoin
         methods.each_pair do |key, method|
           websocket.on(key) { |event| method.call(event) }
         end
+      end
+
+      def topic_path path, values=[]
+        values = [values] unless values.is_a?(Array)
+        "#{path}:#{values.compact.join(',')}"
       end
     end
   end

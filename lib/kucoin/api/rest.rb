@@ -4,9 +4,6 @@ module Kucoin
     class REST
       BASE_URL          = 'https://openapi-v2.kucoin.com'.freeze
       SANDBOX_BASE_URL  = 'https://openapi-sandbox.kucoin.com'.freeze
-      API_KEY           = ENV['KUCOIN_API_KEY'].to_s
-      API_SECRET        = ENV['KUCOIN_API_SECRET'].to_s
-      API_PASSPHRASE    = ENV['KUCOIN_API_PASSPHRASE'].to_s
 
       extend Kucoin::Api::Endpoints
       generate_endpoint_methods
@@ -14,7 +11,7 @@ module Kucoin
       attr_reader :api_key, :api_secret, :api_passphrase
       attr_reader :adapter
 
-      def initialize api_key: API_KEY, api_secret: API_SECRET, api_passphrase: API_PASSPHRASE, adapter: Faraday.default_adapter, sandbox: false
+      def initialize api_key: Kucoin::Api.default_key, api_secret: Kucoin::Api.default_secret, api_passphrase: Kucoin::Api.default_passphrase, adapter: Faraday.default_adapter, sandbox: false
         @api_key = api_key
         @api_secret = api_secret
         @api_passphrase = api_passphrase

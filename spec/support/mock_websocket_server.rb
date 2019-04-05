@@ -85,7 +85,7 @@ def mock_websocket_server response_message=nil, &block
     mock_server = MockWebsocketServer.new
     mock_server.response_message = response_message || { foo: :bar }
     mock_server.start
-    allow_any_instance_of(Kucoin::Api::Websocket).to receive(:endpoint).and_return(mock_server._endpoint)
+    allow_any_instance_of(Kucoin::Api::Endpoints::Websocket::Response).to receive(:endpoint).and_return(mock_server._endpoint)
     block.call(mock_server)
   end
 end

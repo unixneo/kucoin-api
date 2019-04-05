@@ -7,6 +7,10 @@ RSpec.describe Kucoin::Api do
     expect(Kucoin::Api::ENDPOINTS).to be_a Hash
   end
 
+  it { expect(described_class.default_key).to eq '' }
+  it { expect(described_class.default_secret).to eq '' }
+  it { expect(described_class.default_passphrase).to eq '' }
+
   describe 'error class' do
     describe 'Error' do
       it { expect(Kucoin::Api::Error.new).to be_kind_of StandardError }
