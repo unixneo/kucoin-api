@@ -36,6 +36,7 @@ module Kucoin
         return channel
       end
 
+      # PUBLIC
       def ticker symbols:, methods:
         start stream: { topic: topic_path('/market/ticker', symbols) }, methods: methods
       end
@@ -44,13 +45,29 @@ module Kucoin
         ticker symbols: :all, methods: methods
       end
 
-      def stop_order_received_event symbols: , methods:
+      def snapshot symbol:, methods:
+        start stream: { topic: "/market/snapshot:#{symbol}" }, methods: methods
+      end
+      alias symbol_snapshot snapshot
+      alias market_snapshot snapshot
+
+      def level_2_market_data symbols:, methods:
+        start stream: { topic: topic_path('/market/level2', symbols) }, methods: methods
+      end
+
+      def match_execution_data symbols:, methods:
+        start stream: { topic: topic_path('/market/match', symbols) }, methods: methods
+      end
+
+      def full_match_engine_data symbols:, methods:
         start stream: { topic: topic_path('/market/level3', symbols) }, methods: methods
       end
 
-      def stop_order_activate_event symbols: , methods:
-        start stream: { topic: topic_path('/market/level3', symbols) }, methods: methods
+      # PRIVATE
+      def stop_order_received_event symbols: , methods:
+        start stream: { topic: topic_path('/market/level3', symbols), privateChannel: true }, methods: methods
       end
+      alias stop_order_activate_event stop_order_received_event
 
       def balance methods:
         start stream: { topic: '/account/balance', privateChannel: true }, methods: methods
