@@ -3,24 +3,45 @@
 module Kucoin
   module Api
     class Websocket
+      class << self
+        def request_id; rand(Time.now.to_i) end
+
+        def subscribe channel:, params: {}
+          stream  = {id: request_id, privateChannel: false, response: true}.merge(params)
+          params = {
+            id: stream[:id], type: 'subscribe', topic: stream[:topic],
+            privateChannel: stream[:privateChannel], response: stream[:response],
+            tunnelId: stream[:tunnelId]
+          }.select { |k,v| !v.nil? }
+          channel.send(params.to_json)
+        end
+
+        def open_tunnel channel:, params: {}
+          stream  = {id: request_id, response: true}.merge(params)
+          params = {
+            id: stream[:id], type: 'openTunnel', newTunnelId: stream[:newTunnelId], response: stream[:response]
+          }
+          channel.send(params.to_json)
+        end
+      end
+
       attr_reader :rest_client
 
       def initialize rest_client: Kucoin::Api::REST.new
         @rest_client = rest_client
       end
 
-      def open_stream methods:
-        create_stream(rest_client.websocket.public, methods: methods)
-      end
-
-      def auth_stream methods:
-        create_stream(rest_client.websocket.private, methods: methods)
+      def connect private: false, params: {}, methods:
+        create_stream(private ? auth_client(params: params) : open_client(params: params), methods: methods)
       end
 
       # Public: Create a WebSocket stream
       #
       # :stream - The Hash used to define the stream
-      #   :topic    - The String channel to listen to
+      #   :id             - Unique string to mark the request
+      #   :topic          - The topic you want to subscribe to
+      #   :privateChannel - The user will only receive messages related himself on the topic(default is false)
+      #   :response       - To return the ack messages after the subscriptions succeed(default is true)
       #
       # :methods - The Hash which contains the event handler methods to pass to
       #            the WebSocket client
@@ -29,11 +50,22 @@ module Kucoin
       #   :error   - The Proc called when a stream receives an error (optional)
       #   :close   - The Proc called when a stream is closed (optional)
       def start stream:, methods:
-        stream = { id: rand(Time.now.to_i), privateChannel: false, response: true }.merge(stream)
-        channel = stream[:privateChannel] ? auth_stream(methods: methods) : open_stream(methods: methods)
-        params = {id: stream[:id], type: 'subscribe', topic: stream[:topic], privateChannel: stream[:privateChannel], response: stream[:response]}
-        channel.send(params.to_json)
-        return channel
+        channel = connect(private: !!stream[:privateChannel], methods: methods)
+        self.class.subscribe channel: channel, params: stream
+        channel
+      end
+
+      # Public: Create a WebSocket stream for multiplex tunnels
+      #
+      # :stream - The Hash used to define the stream
+      #   :id             - Unique string to mark the request
+      #   :newTunnelId    - Required
+      #   :privateChannel - The user will only receive messages related himself on the topic(default is false)
+      #
+      def multiplex stream:, methods:
+        channel = connect(private: !!stream[:privateChannel], methods: methods)
+        self.class.open_tunnel channel: channel, params: stream
+        channel
       end
 
       # PUBLIC
@@ -55,17 +87,17 @@ module Kucoin
         start stream: { topic: topic_path('/market/level2', symbols) }, methods: methods
       end
 
-      def match_execution_data symbols:, methods:
-        start stream: { topic: topic_path('/market/match', symbols) }, methods: methods
+      def match_execution_data symbols:, methods:, private_channel: false
+        start stream: { topic: topic_path('/market/match', symbols), privateChannel: private_channel }, methods: methods
       end
 
-      def full_match_engine_data symbols:, methods:
-        start stream: { topic: topic_path('/market/level3', symbols) }, methods: methods
+      def full_match_engine_data symbols:, methods:, private_channel: false
+        start stream: { topic: topic_path('/market/level3', symbols), privateChannel: private_channel }, methods: methods
       end
 
       # PRIVATE
       def stop_order_received_event symbols: , methods:
-        start stream: { topic: topic_path('/market/level3', symbols), privateChannel: true }, methods: methods
+        full_match_engine_data symbols: symbols, methods: methods, private_channel: true
       end
       alias stop_order_activate_event stop_order_received_event
 
@@ -75,18 +107,22 @@ module Kucoin
 
       private
 
-      # Internal: Initialize and return a Faye::WebSocket::Client
-      #
-      # url - The String url that the WebSocket should try to connect to
-      #
-      # :methods - The Hash which contains the event handler methods to pass to
-      #            the WebSocket client
-      #   :open    - The Proc called when a stream is opened (optional)
-      #   :message - The Proc called when a stream receives a message
-      #   :error   - The Proc called when a stream receives an error (optional)
-      #   :close   - The Proc called when a stream is closed (optional)
-      def create_stream response, methods:
-        Faye::WebSocket::Client.new("#{response.endpoint}?token=#{response.token}", [], ping: response.ping_interval).tap { |ws| attach_methods(ws, methods) }
+      def open_client params: {}
+        get_client(rest_client.websocket.public, params: params)
+      end
+
+      def auth_client params: {}
+        get_client(rest_client.websocket.private, params: params)
+      end
+
+      def get_client response, params: {}
+        url = ["#{response.endpoint}?token=#{response.token}", URI.encode_www_form(params)].join('&')
+        Faye::WebSocket::Client.new(url, [], ping: response.ping_interval)
+      end
+
+      def create_stream websocket, methods:
+        attach_methods websocket, methods
+        websocket
       end
 
       # Internal: Iterate through methods passed and add them to the WebSocket

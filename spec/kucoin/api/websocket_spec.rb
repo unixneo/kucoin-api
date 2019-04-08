@@ -1,12 +1,23 @@
 RSpec.describe Kucoin::Api::Websocket do
   let(:request_url) { "#{Kucoin::Api::REST::BASE_URL}#{request_path}" }
   before do
-    allow_any_instance_of(Object).to receive(:rand).and_return(981147906)
+    allow(described_class).to receive(:request_id).and_return(981147906)
     stub_request(:post, request_url).to_return(body: acquire_websocket_servers_response.to_json)
   end
   let(:market_symbol) { 'ETH-BTC' }
   let(:rest_client) { Kucoin::Api::REST.new(api_key: 'api_key', api_secret: 'secret', api_passphrase: 'passphrase') }
   let(:client) { Kucoin::Api::Websocket.new(rest_client: rest_client) }
+
+  context '#multiplex' do
+    let(:request_path)  { '/api/v1/bullet-public' }
+    let(:response_data) { {"id"=>981147906, "newTunnelId" => "bt1", "response"=>true, "type"=>"openTunnel"} }
+
+    it 'return valid response' do
+      mock_websocket_server do |mock_server|
+        client.multiplex stream: { newTunnelId: 'bt1' }, methods: mock_websocket_client_methods(mock_server, response_data)
+      end
+    end
+  end
 
   context 'Public topic' do
     let(:request_path) { '/api/v1/bullet-public' }

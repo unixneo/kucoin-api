@@ -45,7 +45,7 @@ Or install it yourself as:
 
 #### TODO
 
-* Websockets currently uses the first InstanceServer returned in the usercenter/loginUser RESTful call. It is currently not clear what Kucoin intends with InstanceServers vs. HistoryServers nor with userType being either "normal" or "vip", so until a use-case arises or feature/bug request comes along that sheds some light on how to select and use specific servers, the websocket interface is hard-wired to the first instance server returned.
+* Websockets currently uses the first InstanceServer returned in the "Apply connect token" RESTful calls. It is currently not clear what Kucoin intends with multiple InstanceServers, so until a use-case arises or feature/bug request comes along that sheds some light on how to select and use specific servers, the websocket interface is hard-wired to the first instance server returned.
 
 ## Getting Started
 
@@ -66,7 +66,7 @@ client = Kucoin::Api::REST.new
 # Otherwise provide an api_key as keyword arguments
 client = Kucoin::Api::REST.new api_key: 'your.api_key', api_secret: 'your.api_secret', api_passphrase: 'your.api_passphrase'
 
-# You can provide a sandbox as argument to change Sandbox environment 
+# You can provide a sandbox as argument to change into Sandbox environment 
 client = Kucoin::Api::REST.new sandbox: true 
 ```
 
@@ -125,15 +125,15 @@ client.account.wallet_address('KCS')
   #     }
 ```
 
-Required and optional parameters, as well as enum values, can currently be found on the [Kucoin Apiary Page](https://kucoinapidocs.docs.apiary.io). Parameters should always be passed to client methods as keyword arguments in snake_case form.  symbol, when a required parameter is simply passed as first parameter for most API calls.
+Required and optional parameters, as well as enum values, can currently be found on the [Kucoin Apiary Page](https://docs.kucoin.com). Parameters should always be passed to client methods as keyword arguments in snake_case form.  symbol, when a required parameter is simply passed as first parameter for most API calls.
 
 ### REST Endpoints
 
-REST endpoints are in order as documented on the Kucoin Apiary page (linked above).  The following lists only the method
-names, aliases (if any) and parameters of the methods to access endpoints.  For the most part, method names follow naming
-of the endpoint's URL and alias method follows the title/name given in Kucoin API documentation.  There were some deviations
-where there would otherwise be name clashes/overloading.
-
+REST endpoints are in order as documented on the Kucoin Apiary page (linked above). 
+Endpoints are accessible by following resourceful structure given in Kucoin API documentation. For example - `user.accounts` is for endpoints given in Kucoin API documentation under "User/Accounts". 
+The following lists only the method names, aliases (if any) and parameters of the methods to access endpoints. 
+For the most part, method names follow RESTful action names and alias method follows the title/name given in Kucoin API documentation. 
+There were some deviations where there would otherwise be name clashes/overloading.
 
 #### User
 
@@ -413,19 +413,52 @@ other.timestamp
 Create a new instance of the WebSocket Client:
 
 ```ruby
+# If you only plan on touching public topics 
 client = Kucoin::Api::Websocket.new
+
+# Changing the rest_client argument for different authentication
+client = Kucoin::Api::Websocket.new rest_client: Kucoin::Api::REST.new(sendbox: true) 
 ```
 
 Subscribe various topics:
 
 ```ruby
-# Currencies Plugin / List exchange rate of coins
+# Public Channels / Symbol Ticker
 methods = { message: proc { |event| puts event.data } }
-client.tick(symbol: 'ETH-BTC', methods: methods)
+client.ticker symbols: 'ETH-BTC', methods: methods
   # => {"id":"259173795477643264","type":"ack"}
-  # => {"data"=>{"coinType"=>"ETH", ...}, "topic"=>"/market/ETH-BTC_TICK", "type"=>"message", "seq"=>32752982312089}
-  # => {"data"=>{"coinType"=>"ETH", ...}, "topic"=>"/market/ETH-BTC_TICK", "type"=>"message", "seq"=>32752982458728}
+  # => {"data":{"sequence":...}, "subject":"trade.ticker","topic":"/market/ticker:ETH-BTC","type":"message"}
+  # => {"data":{"sequence":...}, "subject":"trade.ticker","topic":"/market/ticker:ETH-BTC","type":"message"}
   # => ...
+  
+# Private Channels / Stop order received event
+client.stop_order_received_event symbols: 'BTC-USDT', methods: methods
+  # => {"id":"259173795477643264","type":"ack"}
+  # => {"data":{"sequence":...}, "subject":"trade.l3received","topic":"/market/level3:BTC-USDT","type":"message"}
+  # => {"data":{"sequence":...}, "subject":"trade.l3received","topic":"/market/level3:BTC-USDT","type":"message"}
+  # => ...
+```
+
+Multiplex:
+
+```ruby
+channel = nil
+message = proc do |event|
+  puts event.data
+  data = JSON.parse(event.data)
+  if data['type'] == 'ack' && data['id'] == '1222'
+    Kucoin::Api::Websocket.subscribe(channel: channel, params: { topic: "/market/ticker:ETH-BTC", tunnelId: 'bt1' })
+  end
+end
+methods = { message: message }
+channel = client.multiplex stream: { newTunnelId: 'bt1', id: '1222' }, methods: methods
+  # => {"id":"1222","type":"ack"}
+  # => {"tunnelId":"bt1","id":"170022900","type":"ack"}
+  # => {"data":{"sequence":...},"subject":"trade.ticker","tunnelId":"bt1","topic":"/market/ticker:ETH-BTC","type":"message"}
+  # => {"data":{"sequence":...},"subject":"trade.ticker","tunnelId":"bt1","topic":"/market/ticker:ETH-BTC","type":"message"}
+  
+# Using the one physical connection - `channel`,
+# you could open different multiplex tunnels to subscribe different topics for different data.   
 ```
 
 All subscription topic method will expect "methods" in argument(As shown above).
@@ -436,37 +469,73 @@ Proc is the expected value of each event handler key. Following are list of expe
   - :error   - The Proc called when a stream receives an error (optional)
   - :close   - The Proc called when a stream is closed (optional)
 
-### WebSocket Subscribe Topics
+### Websocket Feed
 
 Subscribe topics are in order as documented on the Kucoin Apiary page (linked above).
 
-#### Orderbook level2
+#### Public Channels
+----
 
 ```ruby
-  client.orderbook symbol: symbol, methods: methods
+# Symbol Ticker
+ticker symbols:, methods:
 ```
-* required params: symbol, methods*
+* required params: symbols(Array/String), methods
 
-#### History
+----
+```ruby
+# All Symbols Ticker
+all_ticker methods:
+```
+* required params: methods
+
+----
+```ruby
+# Symbol Snapshot
+# Market Snapshot
+snapshot symbol:, methods:
+```
+* required params: symbol, methods
+* alias methods: symbol_snapshot, market_snapshot
+
+----
+```ruby
+# Level-2 Market Data
+level_2_market_data symbols:, methods:
+```
+* required params: symbols(Array/String), methods
+
+----
+```ruby
+# Match Execution Data
+match_execution_data symbols:, methods:, private_channel: false
+```
+* required params: symbols(Array/String), methods
+
+----
+```ruby
+# Full MatchEngine Data(Level 3)
+full_match_engine_data symbols:, methods:, private_channel: false
+```
+* required params: symbols(Array/String), methods
+
+#### Private Channels
+----
 
 ```ruby
-  client.history symbol: symbol, methods: methods
+# Stop order received event
+# Stop order activate event
+stop_order_received_event symbols:, methods:
 ```
-* required params: symbol, methods*
+* required params: symbols(Array/String), methods
+* alias methods: stop_order_activate_event
 
-#### Tick
-
+----
 ```ruby
-  client.tick symbol: symbol, methods: methods
+# Account balance notice
+balance methods:
 ```
-* required params: symbol, methods*
-
-#### Market
-
-```ruby
-  client.market symbol: symbol, methods: methods
-```
-* required params: symbol, methods*
+* required params: methods
 
 ## Contributing
 
