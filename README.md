@@ -55,7 +55,7 @@ Or install it yourself as:
 Require Kucoin API:
 
 ```ruby
-require 'kucoin-api'
+require 'kucoin/api'
 ```
 
 Create a new instance of the REST Client:
