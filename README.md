@@ -65,7 +65,10 @@ Create a new instance of the REST Client:
 client = Kucoin::Api::REST.new
 
 # Otherwise provide an api_key as keyword arguments
-client = Kucoin::Api::REST.new api_key: 'your.api_key', api_secret: 'your.api_secret', api_passphrase: 'your.api_passphrase'
+client = Kucoin::Api::REST.new \
+  api_key: 'your.api_key', 
+  api_secret: 'your.api_secret', 
+  api_passphrase: 'your.api_passphrase'
 
 # You can provide a sandbox as argument to change into Sandbox environment 
 client = Kucoin::Api::REST.new sandbox: true 

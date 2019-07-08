@@ -11,13 +11,20 @@ module Kucoin
       attr_reader :api_key, :api_secret, :api_passphrase
       attr_reader :adapter
 
-      def initialize api_key: Kucoin::Api.default_key, api_secret: Kucoin::Api.default_secret, api_passphrase: Kucoin::Api.default_passphrase, adapter: Faraday.default_adapter, sandbox: false
+      def initialize(
+          api_key: Kucoin::Api.default_key, 
+          api_secret: Kucoin::Api.default_secret, 
+          api_passphrase: Kucoin::Api.default_passphrase, 
+          adapter: Faraday.default_adapter, 
+          sandbox: false
+        )
         @api_key = api_key
         @api_secret = api_secret
         @api_passphrase = api_passphrase
         @adapter = adapter
         @sandbox = sandbox
       end
+
       def sandbox?; @sandbox == true end
 
       def base_url
