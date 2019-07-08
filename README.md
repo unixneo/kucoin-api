@@ -8,6 +8,7 @@ This is an unofficial Ruby wrapper for the Kucoin exchange REST and WebSocket AP
 * RESTful interface is fully implemented.
 * Websocket is fully implemented.
 * Pull Requests are very welcome!
+* RSPEC tests depend on Ruby >= 2.4 features, specifically `#match?`  The gem itself should work find with any Ruby 2.x and higher and perhaps 1.9.x, but has certainly not been tested. YMMV!
 
 ## Installation
 
